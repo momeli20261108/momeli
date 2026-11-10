@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#78977b">
+
+<title>Momeli</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;background:#e8f0e5;color:#344438;font-family:Arial,sans-serif}
+
+.app{max-width:430px;min-height:100vh;margin:auto;background:#fffdf7;position:relative;padding-bottom:75px}
+
+header{height:65px;display:flex;align-items:center;justify-content:center;background:#78977b;color:white;font-size:25px;font-weight:bold;letter-spacing:2px}
+
+.page{display:none;padding:16px}
+
+.page.active{display:block}
+
+h2{font-size:21px}
+
+.post{border-radius:17px;overflow:hidden;background:white;box-shadow:0 2px 12px #0001;margin-bottom:20px}
+
+.post img,.post video{width:100%;height:400px;object-fit:cover;background:#e8f0e5}
+
+.post-info{padding:14px}
+
+.post-info p{margin:7px 0}
+
+.actions{display:flex;gap:18px;margin-top:12px}
+
+button{border:0;border-radius:12px;padding:11px 15px;background:#78977b;color:white;font-size:14px}
+
+.actions button{background:#e8f0e5;color:#344438}
+
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:68px;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center}
+
+nav button{background:white;color:#526b56;padding:8px 4px;font-size:12px}
+
+input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccd6ca;border-radius:10px;font-size:15px}
+
+textarea{height:90px}
+
+.item{padding:14px;margin:10px 0;background:#e8f0e5;border-radius:12px}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<header>Momeli</header>
+
+<section id="discover" class="page active">
+
+<h2>Discover</h2>
+
+<div id="feed"></div>
+
+</section>
+
+<section id="trips" class="page">
+
+<h2>My Trips</h2>
+
+<input id="tripName" placeholder="旅行先・旅行名">
+
+<input id="tripDate" type="date">
+
+<button onclick="addTrip()">旅行を追加</button>
+
+<div id="tripList"></div>
+
+</section>
+
+<section id="create" class="page">
+
+<h2>投稿を作成</h2>
+
+<input id="media" type="file" accept="image/*,video/*">
+
+<input id="place" placeholder="旅行先">
+
+<input id="title" placeholder="タイトル">
+
+<textarea id="caption" placeholder="おすすめポイントや思い出を書こう"></textarea>
+
+<button onclick="publish()">投稿する</button>
+
+<p id="message"></p>
+
+</section>
+
+<section id="saved" class="page">
+
+<h2>Saved</h2>
+
+<div id="savedList"></div>
+
+</section>
+
+<section id="profile" class="page">
+
+<h2>Profile</h2>
+
+<div class="item">
+
+<h3>My Momeli</h3>
+
+<p>旅の発見と、思い出を。</p>
+
+<p id="postCount">投稿数：0</p>
+
+</div>
+
+</section>
+
+<nav>
+
+<button onclick="showPage('discover')">Discover</button>
+
+<button onclick="showPage('trips')">Trips</button>
+
+<button onclick="showPage('create')">Create ＋</button>
+
+<button onclick="showPage('saved')">Saved</button>
+
+<button onclick="showPage('profile')">Profile</button>
+
+</nav>
+
+</div>
+
+<script>
+
+let posts=[
+
+{place:"長野県・上高地",title:"自然に癒やされる旅",caption:"透き通った川と山の景色！",image:"https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800",likes:0,saved:false},
+
+{place:"京都・嵐山",title:"京都の風景",caption:"ゆっくり散歩したい場所。",image:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800",likes:0,saved:false}
+
+];
+
+let trips=[];
+
+function showPage(id){
+
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+document.getElementById(id).classList.add("active");
+
+render();
+
+}
+
+function render(){
+
+document.getElementById("feed").innerHTML=posts.map((p,i)=>`
+
+<div class="post">
+
+${p.image.startsWith("data:")&&p.type==="video"
+
+?`<video src="${p.image}" controls></video>`
+
+:`<img src="${p.image}" alt="旅行の写真">`}
+
+<div class="post-info">
+
+<strong>${escapeHTML(p.place)}</strong>
+
+<p>${escapeHTML(p.title)}</p>
+
+<p>${escapeHTML(p.caption)}</p>
+
+<div class="actions">
+
+<button onclick="like(${i})">♥ ${p.likes}</button>
+
+<button onclick="save(${i})">${p.saved?"★ 保存済み":"☆ 保存"}</button>
+
+</div>
+
+</div></div>`).join("");
+
+document.getElementById("savedList").innerHTML=posts.filter(p=>p.saved).map(p=>`<div class="item"><b>${escapeHTML(p.title)}</b><p>${escapeHTML(p.place)}</p></div>`).join("")||"保存した投稿はまだないよ";
+
+document.getElementById("tripList").innerHTML=trips.map(t=>`<div class="item"><b>${escapeHTML(t.name)}</b><p>${escapeHTML(t.date)}</p></div>`).join("");
+
+document.getElementById("postCount").textContent="投稿数："+posts.length;
+
+}
+
+function escapeHTML(s){
+
+return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+}
+
+function like(i){posts[i].likes++;render()}
+
+function save(i){posts[i].saved=!posts[i].saved;render()}
+
+function addTrip(){
+
+let name=document.getElementById("tripName").value;
+
+if(!name)return;
+
+trips.push({name,date:document.getElementById("tripDate").value});
+
+document.getElementById("tripName").value="";
+
+render();
+
+}
+
+function publish(){
+
+let file=document.getElementById("media").files[0];
+
+let place=document.getElementById("place").value;
+
+let title=document.getElementById("title").value;
+
+let caption=document.getElementById("caption").value;
+
+if(!file||!place||!title){document.getElementById("message").textContent="写真・動画、旅行先、タイトルを入力してな";return}
+
+if(file.size>10*1024*1024){document.getElementById("message").textContent="ファイルは10MB以下にしてな";return}
+
+let reader=new FileReader();
+
+reader.onload=()=>{
+
+posts.unshift({place,title,caption,image:reader.result,type:file.type.startsWith("video")?"video":"image",likes:0,saved:false});
+
+document.getElementById("message").textContent="投稿を追加したで！";
+
+render();
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+render();
+
+</script>
+
+</body>
+
+</html>
