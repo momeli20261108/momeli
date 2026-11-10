@@ -199,5 +199,338 @@ async function resetData(){if(!confirm("端末内の投稿・旅行データを�
 async function start(){loadLocal();try{await openDB();await load()}catch(e){posts=samples.map(p=>({...p}));trips=[]}renderFeed();renderTrips();renderSaved();renderProfile()}
 start();
 </script>
+
+<script>
+/* Momeli SNS interaction update */
+(()=>{
+  const objectUrls = new Map();
+
+  function getPost(id){
+    return posts.find(p=>String(p.id)===String(id));
+  }
+
+  function getMedia(p){
+    if(p.file instanceof Blob){
+      if(!objectUrls.has(p.id)){
+        objectUrls.set(p.id,URL.createObjectURL(p.file));
+      }
+      return objectUrls.get(p.id);
+    }
+    return p.image||"";
+  }
+
+  function updatePostActions(id){
+    const p=getPost(id);
+    if(!p)return;
+
+    document.querySelectorAll("#feed .post").forEach(card=>{
+      if(card.dataset.postId!==String(id))return;
+
+      const like=card.querySelector(".like-button");
+      const likeCount=card.querySelector(".like-count");
+      const save=card.querySelector(".save-button");
+
+      if(like){
+        like.classList.toggle("liked",!!p.liked);
+        like.setAttribute("aria-pressed",String(!!p.liked));
+      }
+      if(likeCount)likeCount.textContent=p.likes||0;
+      if(save){
+        save.classList.toggle("saved",!!p.saved);
+        save.setAttribute("aria-pressed",String(!!p.saved));
+      }
+
+      const commentCount=card.querySelector(".comment-count");
+      if(commentCount)commentCount.textContent=(p.comments||[]).length;
+    });
+  }
+
+  window.renderFeed=function(){
+    const feed=document.getElementById("feed");
+    if(!feed)return;
+
+    if(!posts.length){
+      feed.innerHTML='<div class="empty">まだ投稿はありません。<br>最初の旅の思い出を投稿しましょう。</div>';
+      return;
+    }
+
+    feed.innerHTML=posts.map(p=>{
+      const src=getMedia(p);
+      const comments=(p.comments||[]).length;
+
+      return `
+      <article class="post" data-post-id="${safe(p.id)}">
+        ${p.type==="video"
+          ?`<video class="post-media" src="${src}" controls playsinline></video>`
+          :`<img class="post-media" src="${src}" alt="${safe(p.title)}" loading="lazy">`
+        }
+
+        <div class="post-info">
+          <div class="post-place">${icons.pin}<span>${safe(p.place)}</span></div>
+          <div class="post-title">${safe(p.title)}</div>
+          <div class="post-caption">${safe(p.caption)}</div>
+          ${!p.sample?`
+            <button class="post-delete" onclick="deletePost('${safe(p.id)}')">自分の投稿を削除</button>
+          `:""}
+        </div>
+
+        <div class="post-actions">
+          <div class="action-item">
+            <button class="action-btn like-button ${p.liked?"liked":""}"
+              aria-label="いいね" aria-pressed="${!!p.liked}"
+              onclick="likePost('${safe(p.id)}')">${icons.heart}</button>
+            <span class="action-count like-count">${p.likes||0}</span>
+          </div>
+
+          <div class="action-item">
+            <button class="action-btn save-button ${p.saved?"saved":""}"
+              aria-label="保存" aria-pressed="${!!p.saved}"
+              onclick="toggleSave('${safe(p.id)}')">${icons.bookmark}</button>
+            <span class="action-count">保存</span>
+          </div>
+
+          <div class="action-item">
+            <button class="action-btn"
+              aria-label="コメント"
+              onclick="commentPost('${safe(p.id)}')">${icons.comment}</button>
+            <span class="action-count comment-count">${comments}</span>
+          </div>
+
+          <div class="action-item">
+            <button class="action-btn"
+              aria-label="旅行に追加"
+              onclick="addPostToTrip('${safe(p.id)}')">${icons.plus}</button>
+            <span class="action-count">旅行に追加</span>
+          </div>
+        </div>
+      </article>`;
+    }).join("");
+  };
+
+  window.likePost=async function(id){
+    const p=getPost(id);
+    if(!p)return;
+
+    p.liked=!p.liked;
+    p.likes=Math.max(0,(Number(p.likes)||0)+(p.liked?1:-1));
+
+    try{
+      await saveData();
+      updatePostActions(id);
+      renderStats();
+    }catch(e){
+      p.liked=!p.liked;
+      p.likes=Math.max(0,(Number(p.likes)||0)+(p.liked?1:-1));
+      alert("いいねを保存できませんでした。");
+    }
+  };
+
+  window.toggleSave=async function(id){
+    const p=getPost(id);
+    if(!p)return;
+
+    const previous=p.saved;
+    p.saved=!p.saved;
+
+    try{
+      await saveData();
+      updatePostActions(id);
+      renderSaved();
+      renderStats();
+    }catch(e){
+      p.saved=previous;
+      alert("保存できませんでした。");
+    }
+  };
+
+  window.commentPost=function(id){
+    const p=getPost(id);
+    if(!p)return;
+
+    const comments=(p.comments||[]).map(c=>{
+      const value=typeof c==="string"?c:c.text;
+      return `<div class="comment">${safe(value)}</div>`;
+    }).join("");
+
+    openModal(`
+      <h3>コメント</h3>
+      <div id="comments">
+        ${comments||'<p class="sub">まだコメントはありません。</p>'}
+      </div>
+      <div class="comment-form">
+        <textarea id="commentInput" maxlength="300"
+          placeholder="コメントを入力（300文字以内）"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="secondary" onclick="hideModal()">閉じる</button>
+        <button class="primary" onclick="sendComment('${safe(id)}')">送信</button>
+      </div>
+    `);
+  };
+
+  window.sendComment=async function(id){
+    const p=getPost(id);
+    const input=document.getElementById("commentInput");
+    if(!p||!input)return;
+
+    const value=input.value.trim();
+    if(!value)return;
+    if(value.length>300){
+      alert("コメントは300文字以内にしてください。");
+      return;
+    }
+
+    p.comments=p.comments||[];
+    p.comments.push(value);
+
+    try{
+      await saveData();
+      hideModal();
+      updatePostActions(id);
+    }catch(e){
+      p.comments.pop();
+      alert("コメントを保存できませんでした。");
+    }
+  };
+
+  window.renderSaved=function(){
+    const box=document.getElementById("savedList");
+    if(!box)return;
+
+    const saved=posts.filter(p=>p.saved);
+
+    if(!saved.length){
+      box.innerHTML='<div class="empty">保存した投稿はまだありません。<br>気になる投稿を保存しましょう。</div>';
+      return;
+    }
+
+    box.innerHTML=saved.map(p=>`
+      <div class="card saved-post">
+        ${p.type==="video"
+          ?`<video src="${getMedia(p)}" controls playsinline class="saved-thumb"></video>`
+          :`<img src="${getMedia(p)}" class="saved-thumb" alt="${safe(p.title)}">`
+        }
+        <h3>${safe(p.title)}</h3>
+        <p>${safe(p.place)}</p>
+        <button class="secondary small-btn"
+          onclick="openSavedPost('${safe(p.id)}')">投稿を見る</button>
+        <button class="secondary danger small-btn"
+          onclick="unsave('${safe(p.id)}')">保存を解除</button>
+      </div>
+    `).join("");
+  };
+
+  window.openSavedPost=function(id){
+    const index=posts.findIndex(p=>String(p.id)===String(id));
+    if(index<0)return;
+
+    const button=document.querySelectorAll("nav button")[0];
+    showPage("feedPage",button);
+    renderFeed();
+
+    const card=[...document.querySelectorAll("#feed .post")]
+      .find(el=>el.dataset.postId===String(id));
+
+    if(card)card.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+
+  window.unsave=async function(id){
+    const p=getPost(id);
+    if(!p)return;
+
+    p.saved=false;
+    try{
+      await saveData();
+      renderSaved();
+      renderFeed();
+      renderStats();
+    }catch(e){
+      p.saved=true;
+      alert("保存を解除できませんでした。");
+    }
+  };
+
+  window.attachPost=async function(postId,tripId){
+    const t=trips.find(x=>String(x.id)===String(tripId));
+    if(!t)return;
+
+    t.posts=t.posts||[];
+    if(!t.posts.includes(postId))t.posts.push(postId);
+
+    try{
+      await saveData();
+      hideModal();
+      renderTrips();
+      alert("旅行に追加しました。");
+    }catch(e){
+      t.posts=t.posts.filter(x=>x!==postId);
+      alert("保存できませんでした。");
+    }
+  };
+
+  window.deletePost=async function(id){
+    const p=getPost(id);
+    if(!p||p.sample)return;
+
+    if(!confirm("この投稿を削除しますか？"))return;
+
+    const oldPosts=posts;
+    posts=posts.filter(x=>String(x.id)!==String(id));
+
+    trips.forEach(t=>{
+      t.posts=(t.posts||[]).filter(x=>String(x)!==String(id));
+    });
+
+    try{
+      await saveData();
+      renderFeed();
+      renderSaved();
+      renderTrips();
+      renderStats();
+      alert("投稿を削除しました。");
+    }catch(e){
+      posts=oldPosts;
+      alert("削除できませんでした。");
+    }
+  };
+
+  window.renderStats=function(){
+    const postCount=document.getElementById("postCount");
+    const tripCount=document.getElementById("tripCount");
+    const savedCount=document.getElementById("savedCount");
+
+    if(postCount)postCount.textContent=posts.filter(p=>!p.sample).length;
+    if(tripCount)tripCount.textContent=trips.length;
+    if(savedCount)savedCount.textContent=posts.filter(p=>p.saved).length;
+  };
+
+  const style=document.createElement("style");
+  style.textContent=`
+    .post-delete{
+      margin-top:9px;
+      padding:6px 10px;
+      border:1px solid #ffffff88;
+      border-radius:9px;
+      color:white;
+      background:#0005;
+      font-size:11px;
+    }
+    .saved-thumb{
+      display:block;
+      width:100%;
+      max-height:190px;
+      object-fit:cover;
+      border-radius:12px;
+      margin-bottom:10px;
+    }
+    .saved-post{overflow:hidden}
+    .like-button.liked{color:#ff9eae;background:#ffffff40}
+    .save-button.saved{color:#d8edc8;background:#ffffff40}
+  `;
+  document.head.appendChild(style);
+
+})();
+</script>
+
 </body>
 </html>
