@@ -1,403 +1,532 @@
+
 <!DOCTYPE html>
-
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<meta name="theme-color" content="#78977b">
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#78977B">
 <title>Momeli</title>
-
 <style>
-
+:root{
+  --green:#78977B;
+  --dark:#405C45;
+  --pale:#E8F0E5;
+  --cream:#FFFDF7;
+  --text:#28352B;
+}
 *{box-sizing:border-box}
-
-body{margin:0;background:#e8f0e5;color:#344438;font-family:Arial,sans-serif}
-
-.app{max-width:430px;min-height:100vh;margin:auto;background:#fffdf7;position:relative;padding-bottom:75px}
-
-header{height:65px;display:flex;align-items:center;justify-content:center;background:#78977b;color:white;font-size:25px;font-weight:bold;letter-spacing:2px}
-
-.page{display:none;padding:16px}
-
+body{
+  margin:0;background:var(--cream);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+header{
+  position:fixed;top:0;left:0;right:0;height:55px;
+  z-index:20;background:#fffdf7ed;backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;border-bottom:1px solid #e7ebe5;
+}
+.logo{font-size:23px;font-weight:800;color:var(--green);letter-spacing:1px}
+.header-label{font-size:12px;color:#788579}
+main{padding-top:55px;padding-bottom:76px;min-height:100vh}
+.page{display:none;min-height:calc(100vh - 131px)}
 .page.active{display:block}
-
-h2{font-size:21px}
-
-.post{border-radius:17px;overflow:hidden;background:white;box-shadow:0 2px 12px #0001;margin-bottom:20px}
-
-.post img,.post video{width:100%;height:400px;object-fit:cover;background:#e8f0e5}
-
-.post-info{padding:14px}
-
-.post-info p{margin:7px 0}
-
-.actions{display:flex;gap:18px;margin-top:12px}
-
-button{border:0;border-radius:12px;padding:11px 15px;background:#78977b;color:white;font-size:14px}
-
-.actions button{background:#e8f0e5;color:#344438}
-
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:68px;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center}
-
-nav button{background:white;color:#526b56;padding:8px 4px;font-size:12px}
-
-input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccd6ca;border-radius:10px;font-size:15px}
-
-textarea{height:90px}
-
-.item{padding:14px;margin:10px 0;background:#e8f0e5;border-radius:12px}
-
-nav button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-width: 55px;
-  padding: 5px 2px;
-  color: white;
-  font-size: 11px;
+#feedPage{height:calc(100dvh - 131px);overflow-y:auto;scroll-snap-type:y mandatory}
+.post{
+  height:calc(100dvh - 131px);min-height:480px;
+  position:relative;scroll-snap-align:start;overflow:hidden;
+  background:#dce5d9;color:white;
 }
-
-nav button svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.post-media{width:100%;height:100%;object-fit:cover;display:block}
+.post:after{
+  content:"";position:absolute;inset:35% 0 0;
+  background:linear-gradient(transparent,#0009);pointer-events:none;
 }
-
-nav button small {
-  font-size: 10px;
+.post-info{
+  position:absolute;z-index:2;bottom:20px;left:17px;
+  right:75px;text-shadow:0 1px 5px #0008;
 }
-
-nav .create-tab span {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 30px;
-  border-radius: 12px;
-  background: #78977B;
-  color: white;
-  font-size: 25px;
+.post-place{font-size:13px;font-weight:700;margin-bottom:8px}
+.post-title{font-size:21px;font-weight:800;margin-bottom:8px}
+.post-caption{font-size:14px;line-height:1.5;white-space:pre-wrap}
+.post-actions{
+  position:absolute;right:13px;bottom:35px;z-index:3;
+  display:flex;flex-direction:column;gap:20px;align-items:center;
 }
-
+.action-btn{
+  border:0;background:#ffffff25;color:white;border-radius:50%;
+  width:45px;height:45px;font-size:22px;backdrop-filter:blur(8px);
+}
+.action-count{font-size:11px;color:white;text-align:center;margin-top:3px}
+nav{
+  position:fixed;bottom:0;left:0;right:0;height:70px;z-index:30;
+  background:#fffdf7;border-top:1px solid #e6eae4;
+  display:flex;justify-content:space-around;align-items:center;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav button{
+  border:0;background:none;color:#788579;min-width:55px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;font-size:11px;padding:5px 2px;
+}
+nav button .nav-icon{font-size:21px;line-height:24px}
+nav button.active{color:var(--green);font-weight:800}
+nav .create-tab .nav-icon{
+  background:var(--green);color:white;width:36px;height:32px;
+  border-radius:11px;font-size:25px;line-height:30px;
+}
+.section{padding:22px 17px}
+.section h2{font-size:22px;margin:4px 0 18px}
+.sub{font-size:13px;color:#829083;margin-top:-10px;margin-bottom:20px}
+.card{
+  background:white;border:1px solid #e9eee7;border-radius:17px;
+  padding:15px;margin-bottom:13px;box-shadow:0 3px 12px #263c2510;
+}
+.card h3{margin:0 0 7px;font-size:16px}
+.card p{margin:4px 0;color:#788579;font-size:13px}
+.primary{
+  border:0;border-radius:13px;background:var(--green);
+  color:white;padding:13px 17px;font-weight:700;
+}
+.secondary{
+  border:1px solid #dce5d9;border-radius:12px;
+  background:white;color:var(--dark);padding:10px 13px;
+}
+.danger{color:#b34b4b;border-color:#edcccc}
+input,textarea{
+  width:100%;border:1px solid #dce5d9;border-radius:12px;
+  padding:13px;background:white;color:var(--text);margin:6px 0 14px;
+  outline-color:var(--green);
+}
+textarea{min-height:95px;resize:vertical}
+label{font-size:13px;font-weight:700}
+.form-group{margin-bottom:8px}
+.preview{
+  width:100%;max-height:280px;object-fit:contain;
+  background:#edf1eb;border-radius:14px;margin:8px 0;
+}
+.empty{text-align:center;color:#849184;padding:45px 15px;line-height:1.8}
+.profile-top{text-align:center;padding:28px 10px}
+.avatar{
+  width:78px;height:78px;border-radius:50%;background:var(--pale);
+  display:grid;place-items:center;font-size:35px;margin:0 auto 12px;
+}
+.stat-row{display:flex;justify-content:space-around;text-align:center;padding:15px}
+.stat strong{display:block;font-size:20px;color:var(--dark)}
+.stat span{font-size:12px;color:#879286}
+.small-btn{font-size:12px;padding:8px 11px}
+.modal-bg{
+  display:none;position:fixed;inset:0;background:#0007;z-index:60;
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--cream);width:100%;max-width:400px;
+  border-radius:20px;padding:20px;max-height:80vh;overflow:auto;
+}
+.modal h3{margin-top:0}
+.modal-actions{display:flex;gap:9px;justify-content:flex-end}
+@media(min-width:700px){
+  body{max-width:480px;margin:auto;border-left:1px solid #eee;border-right:1px solid #eee}
+  header,nav{max-width:480px;margin:auto}
+}
 </style>
-
 </head>
-
 <body>
 
-<div class="app">
+<header>
+  <div class="logo">Momeli</div>
+  <div class="header-label">travel memories</div>
+</header>
 
-<header>Momeli</header>
+<main>
+  <section id="feedPage" class="page active">
+    <div id="feed"></div>
+  </section>
 
-<section id="discover" class="page active">
+  <section id="tripsPage" class="page">
+    <div class="section">
+      <h2>旅行</h2>
+      <p class="sub">行きたい場所や旅行の予定をまとめよう。</p>
+      <div class="card">
+        <h3>＋ 新しい旅行を作成</h3>
+        <div class="form-group">
+          <label>旅行の名前</label>
+          <input id="tripName" placeholder="例：沖縄旅行">
+        </div>
+        <div class="form-group">
+          <label>日付</label>
+          <input id="tripDate" type="date">
+        </div>
+        <button class="primary" onclick="addTrip()">旅行を作成する</button>
+      </div>
+      <div id="tripList"></div>
+    </div>
+  </section>
 
-<h2>Discover</h2>
+  <section id="createPage" class="page">
+    <div class="section">
+      <h2>投稿を作成</h2>
+      <p class="sub">旅先で見つけた景色や思い出をシェアしよう。</p>
+      <div class="card">
+        <div class="form-group">
+          <label>写真・動画を選択</label>
+          <input id="mediaFile" type="file" accept="image/*,video/*" onchange="previewMedia(event)">
+          <div id="mediaPreview"></div>
+        </div>
+        <div class="form-group">
+          <label>場所</label>
+          <input id="postPlace" placeholder="例：京都・嵐山">
+        </div>
+        <div class="form-group">
+          <label>タイトル</label>
+          <input id="postTitle" placeholder="例：景色が最高だった！">
+        </div>
+        <div class="form-group">
+          <label>コメント</label>
+          <textarea id="postCaption" placeholder="おすすめポイントや旅の感想を書こう"></textarea>
+        </div>
+        <button class="primary" style="width:100%" onclick="publish()">投稿する</button>
+        <p style="font-size:11px;color:#879286">※投稿は現在この端末のブラウザ内に保存される試作版です。</p>
+      </div>
+    </div>
+  </section>
 
-<div id="feed"></div>
+  <section id="savedPage" class="page">
+    <div class="section">
+      <h2>保存</h2>
+      <p class="sub">あとで見返したい投稿を集めよう。</p>
+      <div id="savedList"></div>
+    </div>
+  </section>
 
-</section>
-
-<section id="trips" class="page">
-
-<h2>My Trips</h2>
-
-<input id="tripName" placeholder="旅行先・旅行名">
-
-<input id="tripDate" type="date">
-
-<button onclick="addTrip()">旅行を追加</button>
-
-<div id="tripList"></div>
-
-</section>
-
-<section id="create" class="page">
-
-<h2>投稿を作成</h2>
-
-<input id="media" type="file" accept="image/*,video/*">
-
-<input id="place" placeholder="旅行先">
-
-<input id="title" placeholder="タイトル">
-
-<textarea id="caption" placeholder="おすすめポイントや思い出を書こう"></textarea>
-
-<button onclick="publish()">投稿する</button>
-
-<p id="message"></p>
-
-</section>
-
-<section id="saved" class="page">
-
-<h2>Saved</h2>
-
-<div id="savedList"></div>
-
-</section>
-
-<section id="profile" class="page">
-
-<h2>Profile</h2>
-
-<div class="item">
-
-<h3>My Momeli</h3>
-
-<p>旅の発見と、思い出を。</p>
-
-<p id="postCount">投稿数：0</p>
-
-</div>
-
-</section>
-
-
+  <section id="profilePage" class="page">
+    <div class="section">
+      <div class="profile-top">
+        <div class="avatar">🌿</div>
+        <h2 style="margin:0">マイページ</h2>
+        <p class="sub" style="margin:7px 0">Momeliで旅の思い出を残そう。</p>
+      </div>
+      <div class="card stat-row">
+        <div class="stat"><strong id="postCount">0</strong><span>投稿</span></div>
+        <div class="stat"><strong id="tripCount">0</strong><span>旅行</span></div>
+        <div class="stat"><strong id="savedCount">0</strong><span>保存</span></div>
+      </div>
+      <div class="card">
+        <h3>Momeliについて</h3>
+        <p>旅先を見つけて、計画して、思い出を残す。</p>
+        <p>Momeli - Your travel memories.</p>
+      </div>
+      <div class="card">
+        <h3>データについて</h3>
+        <p>現在の投稿・旅行は、このブラウザ内に保存されます。他の人の端末とは共有されません。</p>
+        <button class="secondary danger small-btn" onclick="resetData()">この端末のデータを初期化</button>
+      </div>
+    </div>
+  </section>
+</main>
 
 <nav>
-
-  <button onclick="showPage('discover')">
-
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m10 8 6 4-6 4z"/></svg>
-
-    <small>フィード</small>
-
+  <button class="active" onclick="showPage('feedPage',this)">
+    <span class="nav-icon">▣</span><span>フィード</span>
   </button>
-
-  <button onclick="showPage('trips')">
-
-    <svg viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15m6-12v15"/><path d="M17 8a3 3 0 1 0-6 0c0 2 3 5 3 5s3-3 3-5z"/></svg>
-
-    <small>旅行</small>
-
+  <button onclick="showPage('tripsPage',this)">
+    <span class="nav-icon">📍</span><span>旅行</span>
   </button>
-
-  <button class="create-tab" onclick="showPage('create')">
-
-    <span>＋</span>
-
-    <small>投稿</small>
-
+  <button class="create-tab" onclick="showPage('createPage',this)">
+    <span class="nav-icon">＋</span><span>投稿</span>
   </button>
-
-  <button onclick="showPage('saved')">
-
-    <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
-
-    <small>保存</small>
-
+  <button onclick="showPage('savedPage',this)">
+    <span class="nav-icon">♡</span><span>保存</span>
   </button>
-
-  <button onclick="showPage('profile')">
-
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-
-    <small>マイページ</small>
-
+  <button onclick="showPage('profilePage',this)">
+    <span class="nav-icon">♙</span><span>マイページ</span>
   </button>
-
 </nav>
 
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal" id="modal"></div>
 </div>
 
 <script>
+let posts=[];
+let trips=[];
+let selectedFile=null;
+let db;
 
-let posts=[
-
-{place:"長野県・上高地",title:"自然に癒やされる旅",caption:"透き通った川と山の景色！",image:"https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800",likes:0,saved:false},
-
-{place:"京都・嵐山",title:"京都の風景",caption:"ゆっくり散歩したい場所。",image:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800",likes:0,saved:false}
-
+const starterPosts=[
+ {id:"sample1",place:"長野・上高地",title:"自然に囲まれた最高の景色",caption:"空気が澄んでいて、ずっと歩いていたくなる場所。",image:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1000",likes:12,saved:false,sample:true},
+ {id:"sample2",place:"京都・嵐山",title:"京都でのんびり散歩",caption:"ゆっくり景色を楽しめるおすすめスポット。",image:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000",likes:24,saved:false,sample:true},
+ {id:"sample3",place:"沖縄",title:"海がきれいすぎた！",caption:"また行きたいと思える景色。",image:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1000",likes:31,saved:false,sample:true}
 ];
 
-let trips=[];
-
-function showPage(id){
-
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-
-document.getElementById(id).classList.add("active");
-
-render();
-
+function openDB(){
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open("momeliDB",2);
+  request.onupgradeneeded=()=>{
+   const d=request.result;
+   if(!d.objectStoreNames.contains("data"))d.createObjectStore("data");
+  };
+  request.onsuccess=()=>{db=request.result;resolve(db)};
+  request.onerror=()=>reject(request.error);
+ });
 }
 
-function render(){
-
-document.getElementById("feed").innerHTML=posts.map((p,i)=>`
-
-<div class="post">
-
-${p.image.startsWith("data:")&&p.type==="video"
-
-?`<video src="${p.image}" controls></video>`
-
-:`<img src="${p.image}" alt="旅行の写真">`}
-
-<div class="post-info">
-
-<strong>${escapeHTML(p.place)}</strong>
-
-<p>${escapeHTML(p.title)}</p>
-
-<p>${escapeHTML(p.caption)}</p>
-
-<div class="actions">
-
-<button onclick="like(${i})">♥ ${p.likes}</button>
-
-<button onclick="save(${i})">${p.saved?"★ 保存済み":"☆ 保存"}</button>
-
-</div>
-
-</div></div>`).join("");
-
-document.getElementById("savedList").innerHTML=posts.filter(p=>p.saved).map(p=>`<div class="item"><b>${escapeHTML(p.title)}</b><p>${escapeHTML(p.place)}</p></div>`).join("")||"保存した投稿はまだないよ";
-
-document.getElementById("tripList").innerHTML=trips.map(t=>`<div class="item"><b>${escapeHTML(t.name)}</b><p>${escapeHTML(t.date)}</p></div>`).join("");
-
-document.getElementById("postCount").textContent="投稿数："+posts.length;
-
+async function saveData(){
+ if(!db)return;
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction("data","readwrite");
+  tx.objectStore("data").put({posts,trips},"main");
+  tx.oncomplete=resolve;
+  tx.onerror=()=>reject(tx.error);
+ });
 }
 
-function escapeHTML(s){
-
-return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
+async function loadData(){
+ await openDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction("data","readonly");
+  const req=tx.objectStore("data").get("main");
+  req.onsuccess=()=>{
+   if(req.result){
+    posts=req.result.posts||[];
+    trips=req.result.trips||[];
+   }else{
+    posts=starterPosts;
+    trips=[];
+   }
+   resolve();
+  };
+  req.onerror=()=>reject(req.error);
+ });
 }
 
-function like(i){
-  posts[i].likes++;
-  saveMomeliData();
-  render();
+function showPage(id,button){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+ if(id==="feedPage")renderFeed();
+ if(id==="savedPage")renderSaved();
+ if(id==="tripsPage")renderTrips();
 }
 
-function save(i){
-  posts[i].saved=!posts[i].saved;
-  saveMomeliData();
-  render();
+function safe(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
 }
 
-function addTrip(){
-
-let name=document.getElementById("tripName").value;
-
-if(!name)return;
-
-trips.push({name,date:document.getElementById("tripDate").value});
-saveMomeliData();
-
-document.getElementById("tripName").value="";
-
-render();
-
+function mediaURL(p){
+ if(p.file instanceof Blob)return URL.createObjectURL(p.file);
+ return p.image||"";
 }
 
-function publish(){
-
-let file=document.getElementById("media").files[0];
-
-let place=document.getElementById("place").value;
-
-let title=document.getElementById("title").value;
-
-let caption=document.getElementById("caption").value;
-
-if(!file||!place||!title){document.getElementById("message").textContent="写真・動画、旅行先、タイトルを入力してな";return}
-
-if(file.size>10*1024*1024){document.getElementById("message").textContent="ファイルは10MB以下にしてな";return}
-
-let reader=new FileReader();
-
-reader.onload=()=>{
-
-posts.unshift({place,title,caption,image:reader.result,type:file.type.startsWith("video")?"video":"image",likes:0,saved:false});
-saveMomeliData();
-document.getElementById("message").textContent="投稿を追加したで！";
-
-render();
-
-};
-
-reader.readAsDataURL(file);
-
+function renderFeed(){
+ const feed=document.getElementById("feed");
+ if(!posts.length){
+  feed.innerHTML='<div class="empty">まだ投稿がないよ。<br>最初の旅の思い出を投稿してみよう！</div>';
+  return;
+ }
+ feed.innerHTML=posts.map((p,i)=>{
+  const src=mediaURL(p);
+  const video=p.type==="video";
+  return `<article class="post">
+   ${video?`<video class="post-media" src="${src}" controls playsinline></video>`:`<img class="post-media" src="${src}" alt="旅行の投稿">`}
+   <div class="post-info">
+    <div class="post-place">📍 ${safe(p.place)}</div>
+    <div class="post-title">${safe(p.title)}</div>
+    <div class="post-caption">${safe(p.caption)}</div>
+   </div>
+   <div class="post-actions">
+    <div><button class="action-btn" onclick="likePost('${p.id}')">${p.liked?"♥":"♡"}</button><div class="action-count">${p.likes||0}</div></div>
+    <div><button class="action-btn" onclick="toggleSave('${p.id}')">${p.saved?"★":"☆"}</button><div class="action-count">保存</div></div>
+    <div><button class="action-btn" onclick="commentPost('${p.id}')">💬</button><div class="action-count">${(p.comments||[]).length}</div></div>
+    <div><button class="action-btn" onclick="addPostToTrip('${p.id}')">＋</button><div class="action-count">旅行へ</div></div>
+   </div>
+  </article>`;
+ }).join("");
 }
 
-loadMomeliData().then(()=>{
-  render();
-}).catch(()=>{
-  render();
-});
-
-
-function openMomeliDB(){
-  return new Promise((resolve,reject)=>{
-    const request=indexedDB.open("momeliDB",1);
-
-    request.onupgradeneeded=()=>{
-      request.result.createObjectStore("data");
-    };
-
-    request.onsuccess=()=>resolve(request.result);
-    request.onerror=()=>reject(request.error);
-  });
+async function likePost(id){
+ const p=posts.find(x=>x.id===id);
+ if(!p)return;
+ p.liked=!p.liked;
+ p.likes=Math.max(0,(p.likes||0)+(p.liked?1:-1));
+ await saveData();renderFeed();
 }
 
-async function saveMomeliData(){
-  const db=await openMomeliDB();
-
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction("data","readwrite");
-    tx.objectStore("data").put({posts,trips},"main");
-
-    tx.oncomplete=()=>{
-      db.close();
-      resolve();
-    };
-
-    tx.onerror=()=>{
-      db.close();
-      reject(tx.error);
-    };
-  });
+async function toggleSave(id){
+ const p=posts.find(x=>x.id===id);
+ if(!p)return;
+ p.saved=!p.saved;
+ await saveData();renderFeed();renderSaved();renderStats();
 }
 
-async function loadMomeliData(){
-  const db=await openMomeliDB();
-
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction("data","readonly");
-    const request=tx.objectStore("data").get("main");
-
-    request.onsuccess=()=>{
-      if(request.result){
-        posts=request.result.posts;
-        trips=request.result.trips;
-      }
-      db.close();
-      resolve();
-    };
-
-    request.onerror=()=>{
-      db.close();
-      reject(request.error);
-    };
-  });
+function commentPost(id){
+ const p=posts.find(x=>x.id===id);
+ if(!p)return;
+ openModal(`<h3>コメント</h3>
+ <div id="comments">${(p.comments||[]).map(c=>`<p>💬 ${safe(c)}</p>`).join("")||'<p class="sub">まだコメントはないよ。</p>'}</div>
+ <textarea id="commentInput" placeholder="コメントを書く"></textarea>
+ <div class="modal-actions"><button class="secondary" onclick="hideModal()">閉じる</button><button class="primary" onclick="sendComment('${id}')">送信</button></div>`);
 }
 
+async function sendComment(id){
+ const p=posts.find(x=>x.id===id);
+ const value=document.getElementById("commentInput").value.trim();
+ if(!value)return;
+ p.comments=p.comments||[];
+ p.comments.push(value);
+ await saveData();hideModal();renderFeed();
+}
+
+function addPostToTrip(id){
+ if(!trips.length){alert("先に「旅行」から旅行を作成してな！");return}
+ openModal(`<h3>旅行に追加</h3>${trips.map(t=>`<button class="secondary" style="width:100%;margin:5px 0" onclick="attachPost('${id}','${t.id}')">${safe(t.name)}</button>`).join("")}<button class="secondary" style="width:100%;margin-top:10px" onclick="hideModal()">閉じる</button>`);
+}
+
+async function attachPost(postId,tripId){
+ const t=trips.find(x=>x.id===tripId);
+ if(t&&!t.posts.includes(postId))t.posts.push(postId);
+ await saveData();hideModal();alert("旅行に追加したで！");
+}
+
+function previewMedia(event){
+ selectedFile=event.target.files[0]||null;
+ const box=document.getElementById("mediaPreview");
+ if(!selectedFile){box.innerHTML="";return}
+ const url=URL.createObjectURL(selectedFile);
+ box.innerHTML=selectedFile.type.startsWith("video/")
+ ?`<video class="preview" src="${url}" controls></video>`
+ :`<img class="preview" src="${url}" alt="投稿プレビュー">`;
+}
+
+async function publish(){
+ if(!selectedFile){alert("写真か動画を選んでな！");return}
+ const place=document.getElementById("postPlace").value.trim();
+ const title=document.getElementById("postTitle").value.trim();
+ const caption=document.getElementById("postCaption").value.trim();
+ if(!place||!title){alert("場所とタイトルを入力してな！");return}
+ if(selectedFile.size>40*1024*1024){alert("ファイルは40MB以下にしてな！");return}
+ const post={
+  id:"post_"+Date.now(),
+  place,title,caption,
+  file:selectedFile,
+  type:selectedFile.type.startsWith("video/")?"video":"image",
+  likes:0,saved:false,liked:false,comments:[]
+ };
+ posts.unshift(post);
+ try{
+  await saveData();
+  selectedFile=null;
+  document.getElementById("mediaFile").value="";
+  document.getElementById("mediaPreview").innerHTML="";
+  document.getElementById("postPlace").value="";
+  document.getElementById("postTitle").value="";
+  document.getElementById("postCaption").value="";
+  alert("投稿を保存したで！");
+  renderFeed();renderStats();
+  document.querySelectorAll("nav button")[0].click();
+ }catch(e){
+  posts.shift();
+  alert("保存できなかった。端末の空き容量を確認してな。");
+ }
+}
+
+async function addTrip(){
+ const name=document.getElementById("tripName").value.trim();
+ const date=document.getElementById("tripDate").value;
+ if(!name){alert("旅行の名前を入力してな！");return}
+ trips.push({id:"trip_"+Date.now(),name,date,posts:[]});
+ await saveData();
+ document.getElementById("tripName").value="";
+ document.getElementById("tripDate").value="";
+ renderTrips();renderStats();
+}
+
+function renderTrips(){
+ const box=document.getElementById("tripList");
+ if(!trips.length){
+  box.innerHTML='<div class="empty">まだ旅行はないよ。<br>最初の旅行を作ってみよう！</div>';
+  return;
+ }
+ box.innerHTML=trips.map(t=>`
+  <div class="card">
+   <h3>📍 ${safe(t.name)}</h3>
+   <p>${safe(t.date||"日程未定")}</p>
+   <p>追加した投稿：${t.posts.length}件</p>
+   <button class="secondary small-btn" onclick="showTrip('${t.id}')">詳細を見る</button>
+   <button class="secondary danger small-btn" onclick="deleteTrip('${t.id}')">削除</button>
+  </div>`).join("");
+}
+
+function showTrip(id){
+ const t=trips.find(x=>x.id===id);
+ if(!t)return;
+ const attached=posts.filter(p=>t.posts.includes(p.id));
+ openModal(`<h3>${safe(t.name)}</h3><p class="sub">${safe(t.date||"日程未定")}</p>
+ ${attached.map(p=>`<div class="card"><b>${safe(p.title)}</b><p>${safe(p.place)}</p></div>`).join("")||"<p>まだ投稿は追加されていないよ。</p>"}
+ <button class="secondary" onclick="hideModal()">閉じる</button>`);
+}
+
+async function deleteTrip(id){
+ if(!confirm("この旅行を削除する？"))return;
+ trips=trips.filter(t=>t.id!==id);
+ await saveData();renderTrips();renderStats();
+}
+
+function renderSaved(){
+ const box=document.getElementById("savedList");
+ const saved=posts.filter(p=>p.saved);
+ if(!saved.length){
+  box.innerHTML='<div class="empty">保存した投稿はまだないよ。<br>気になる投稿を☆で保存しよう！</div>';
+  return;
+ }
+ box.innerHTML=saved.map(p=>`
+  <div class="card">
+   <h3>${safe(p.title)}</h3><p>📍 ${safe(p.place)}</p>
+   <button class="secondary small-btn" onclick="unsave('${p.id}')">保存を解除</button>
+  </div>`).join("");
+}
+
+async function unsave(id){
+ const p=posts.find(x=>x.id===id);
+ if(p)p.saved=false;
+ await saveData();renderSaved();renderStats();renderFeed();
+}
+
+function renderStats(){
+ document.getElementById("postCount").textContent=posts.filter(p=>!p.sample).length;
+ document.getElementById("tripCount").textContent=trips.length;
+ document.getElementById("savedCount").textContent=posts.filter(p=>p.saved).length;
+}
+
+function openModal(html){
+ document.getElementById("modal").innerHTML=html;
+ document.getElementById("modalBg").classList.add("show");
+}
+function hideModal(){document.getElementById("modalBg").classList.remove("show")}
+function closeModal(e){if(e.target.id==="modalBg")hideModal()}
+
+async function resetData(){
+ if(!confirm("投稿・旅行のデータを初期化する？"))return;
+ posts=starterPosts.map(p=>({...p}));
+ trips=[];
+ await saveData();renderFeed();renderTrips();renderSaved();renderStats();
+ alert("初期化したで！");
+}
+
+async function start(){
+ try{
+  await loadData();
+ }catch(e){
+  posts=starterPosts;trips=[];
+ }
+ renderFeed();renderTrips();renderSaved();renderStats();
+}
+start();
 </script>
-
 </body>
-
 </html>
