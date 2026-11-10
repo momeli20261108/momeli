@@ -52,6 +52,43 @@ textarea{height:90px}
 
 .item{padding:14px;margin:10px 0;background:#e8f0e5;border-radius:12px}
 
+nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 55px;
+  padding: 5px 2px;
+  color: white;
+  font-size: 11px;
+}
+
+nav button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+nav button small {
+  font-size: 10px;
+}
+
+nav .create-tab span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 30px;
+  border-radius: 12px;
+  background: #78977B;
+  color: white;
+  font-size: 25px;
+}
+
 </style>
 
 </head>
@@ -126,17 +163,49 @@ textarea{height:90px}
 
 </section>
 
+
+
 <nav>
 
-<button onclick="showPage('discover')">Discover</button>
+  <button onclick="showPage('discover')">
 
-<button onclick="showPage('trips')">Trips</button>
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m10 8 6 4-6 4z"/></svg>
 
-<button onclick="showPage('create')">Create ＋</button>
+    <small>フィード</small>
 
-<button onclick="showPage('saved')">Saved</button>
+  </button>
 
-<button onclick="showPage('profile')">Profile</button>
+  <button onclick="showPage('trips')">
+
+    <svg viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15m6-12v15"/><path d="M17 8a3 3 0 1 0-6 0c0 2 3 5 3 5s3-3 3-5z"/></svg>
+
+    <small>旅行</small>
+
+  </button>
+
+  <button class="create-tab" onclick="showPage('create')">
+
+    <span>＋</span>
+
+    <small>投稿</small>
+
+  </button>
+
+  <button onclick="showPage('saved')">
+
+    <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+
+    <small>保存</small>
+
+  </button>
+
+  <button onclick="showPage('profile')">
+
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+
+    <small>マイページ</small>
+
+  </button>
 
 </nav>
 
