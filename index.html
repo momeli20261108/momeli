@@ -856,3 +856,226 @@ start();
 
 </body>
 </html>
+
+<style>
+#momeliSearch{
+  padding:12px 16px;
+  background:#FFFDF7;
+  position:sticky;
+  top:55px;
+  z-index:10;
+}
+#momeliSearch input{margin:0}
+.momeli-extra{padding:15px;background:white;border:1px solid #e9eee7;border-radius:16px;margin:12px 0}
+.momeli-extra h3{margin:0 0 12px}
+.momeli-user{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf0eb}
+.momeli-user:last-child{border:0}
+.momeli-notice{padding:10px 0;border-bottom:1px solid #edf0eb;font-size:13px}
+.momeli-tag{display:inline-block;background:#E8F0E5;color:#405C45;padding:5px 9px;border-radius:20px;margin:3px;font-size:12px}
+</style>
+
+<script>
+(()=>{
+  const originalRenderFeed=renderFeed;
+  const originalAddTrip=addTrip;
+  const originalLikePost=likePost;
+  const originalSendComment=sendComment;
+
+  let searchWord="";
+  let profile={name:"旅行好き",bio:"旅の思い出を記録しています。"};
+  let follows=[];
+  let notices=[];
+
+  try{
+    profile=JSON.parse(localStorage.getItem("momeliProfile"))||profile;
+    follows=JSON.parse(localStorage.getItem("momeliFollows"))||[];
+    notices=JSON.parse(localStorage.getItem("momeliNotices"))||[];
+  }catch(e){}
+
+  function saveExtra(){
+    try{
+      localStorage.setItem("momeliProfile",JSON.stringify(profile));
+      localStorage.setItem("momeliFollows",JSON.stringify(follows));
+      localStorage.setItem("momeliNotices",JSON.stringify(notices));
+    }catch(e){}
+  }
+
+  function addNotice(message){
+    notices.unshift({message,date:new Date().toLocaleString("ja-JP")});
+    notices=notices.slice(0,30);
+    saveExtra();
+    renderNotices();
+  }
+
+  function renderSearch(){
+    const feed=document.getElementById("feed");
+    if(!feed)return;
+
+    const word=searchWord.toLowerCase();
+    [...feed.querySelectorAll(".post")].forEach(card=>{
+      card.style.display=card.textContent.toLowerCase().includes(word)?"":"none";
+    });
+  }
+
+  renderFeed=function(){
+    originalRenderFeed();
+    renderSearch();
+  };
+
+  const search=document.createElement("div");
+  search.id="momeliSearch";
+  search.innerHTML=`
+    <input id="momeliSearchInput"
+      placeholder="場所・投稿・#ハッシュタグを検索">
+  `;
+  document.getElementById("feedPage").prepend(search);
+
+  search.querySelector("input").addEventListener("input",e=>{
+    searchWord=e.target.value.trim();
+    renderSearch();
+  });
+
+  async function renderNotices(){
+    const box=document.getElementById("momeliNoticeList");
+    if(!box)return;
+
+    box.innerHTML=notices.length
+      ?notices.map(n=>`
+        <div class="momeli-notice">
+          ${safe(n.message)}
+          <p>${safe(n.date)}</p>
+        </div>
+      `).join("")
+      :'<p>まだ通知はありません。</p>';
+  }
+
+  function renderProfileExtra(){
+    const page=document.getElementById("profilePage");
+    if(!page || document.getElementById("momeliExtra"))return;
+
+    const area=document.createElement("div");
+    area.id="momeliExtra";
+    area.innerHTML=`
+      <div class="momeli-extra">
+        <h3 id="momeliName"></h3>
+        <p id="momeliBio"></p>
+        <button class="secondary" onclick="editMomeliProfile()">プロフィールを編集</button>
+      </div>
+
+      <div class="momeli-extra">
+        <h3>フォロー</h3>
+        <p>フォロー中：<strong id="momeliFollowCount">0</strong></p>
+        <div id="momeliUsers"></div>
+      </div>
+
+      <div class="momeli-extra">
+        <h3>通知</h3>
+        <div id="momeliNoticeList"></div>
+      </div>
+    `;
+    page.querySelector(".profile-top").after(area);
+    updateProfile();
+  }
+
+  function updateProfile(){
+    const name=document.getElementById("momeliName");
+    if(!name)return;
+    name.textContent=profile.name;
+    document.getElementById("momeliBio").textContent=profile.bio;
+    document.getElementById("momeliFollowCount").textContent=follows.length;
+    renderUsers();
+    renderNotices();
+  }
+
+  function renderUsers(){
+    const box=document.getElementById("momeliUsers");
+    if(!box)return;
+
+    const users=[
+      {id:"user1",name:"旅の記録"},
+      {id:"user2",name:"週末トラベラー"},
+      {id:"user3",name:"景色を探す人"}
+    ];
+
+    box.innerHTML=users.map(u=>`
+      <div class="momeli-user">
+        <strong>${u.name}</strong>
+        <button class="secondary small-btn"
+          onclick="toggleMomeliFollow('${u.id}')">
+          ${follows.includes(u.id)?"フォロー中":"フォロー"}
+        </button>
+      </div>
+    `).join("");
+  }
+
+  window.editMomeliProfile=function(){
+    openModal(`
+      <h3>プロフィール編集</h3>
+      <label>名前</label>
+      <input id="momeliEditName" value="${safe(profile.name)}">
+      <label>自己紹介</label>
+      <textarea id="momeliEditBio">${safe(profile.bio)}</textarea>
+      <div class="modal-actions">
+        <button class="secondary" onclick="hideModal()">キャンセル</button>
+        <button class="primary" onclick="saveMomeliProfile()">保存</button>
+      </div>
+    `);
+  };
+
+  window.saveMomeliProfile=function(){
+    const name=document.getElementById("momeliEditName").value.trim();
+    const bio=document.getElementById("momeliEditBio").value.trim();
+    if(!name){alert("名前を入力してください。");return;}
+    profile={name,bio};
+    saveExtra();
+    updateProfile();
+    hideModal();
+  };
+
+  window.toggleMomeliFollow=function(id){
+    if(follows.includes(id)){
+      follows=follows.filter(x=>x!==id);
+    }else{
+      follows.push(id);
+      addNotice("おすすめユーザーをフォローしました。");
+    }
+    saveExtra();
+    updateProfile();
+  };
+
+  likePost=async function(id){
+    const p=posts.find(x=>x.id===id);
+    const wasLiked=p?.liked;
+    await originalLikePost(id);
+    if(p && !wasLiked)addNotice("投稿にいいねしました。");
+  };
+
+  sendComment=async function(id){
+    await originalSendComment(id);
+    addNotice("コメントを投稿しました。");
+  };
+
+  addTrip=async function(){
+    const before=trips.length;
+    await originalAddTrip();
+    if(trips.length>before){
+      const t=trips[trips.length-1];
+      t.budget=0;
+      t.memo="";
+      await saveData();
+    }
+  };
+
+  const profileObserver=new MutationObserver(()=>{
+    renderProfileExtra();
+  });
+  profileObserver.observe(document.getElementById("profilePage"),{
+    childList:true,subtree:true
+  });
+
+  renderProfileExtra();
+  updateProfile();
+})();
+</script>
+</body>
+
