@@ -7,130 +7,149 @@
 <meta name="theme-color" content="#78977B">
 <title>Momeli</title>
 <style>
-:root{--g:#78977B;--d:#405C45;--p:#E8F0E5;--cream:#FFFDF7;--text:#28352B}
+:root{--g:#78977B;--p:#E8F0E5;--bg:#FFFDF7;--ink:#344238;--muted:#89958A;--line:#E8EDE6}
 *{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
-button,input,textarea{font:inherit}
-button{cursor:pointer}
-header{height:55px;position:fixed;z-index:10;top:0;left:0;right:0;background:#fffdf7ee;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #e7ebe5}
-.logo{font-size:23px;font-weight:800;color:var(--g);letter-spacing:1px}
-.header-label{font-size:12px;color:#788579}
-main{padding-top:55px;padding-bottom:85px;min-height:100vh}
-.page{display:none;min-height:calc(100vh - 140px)}
-.page.active{display:block}
-#feedPage{height:calc(100dvh - 140px);overflow-y:auto;scroll-snap-type:y mandatory}
-.post{height:calc(100dvh - 140px);min-height:480px;position:relative;scroll-snap-align:start;overflow:hidden;background:#dce5d9;color:white}
-.post-media{width:100%;height:100%;object-fit:cover;display:block}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+header{height:58px;position:fixed;z-index:10;top:0;left:0;right:0;background:#fffdf7ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.logo{font-size:25px;font-weight:850;color:var(--g)}
+.tagline{font-size:10px;color:var(--muted)}
+main{max-width:600px;margin:auto;padding:58px 0 85px;min-height:100dvh}
+.page{display:none}.page.active{display:block}
+.section{padding:20px 16px}
+.section h2{margin:4px 0 8px;font-size:23px}
+.desc{font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 17px}
+nav{position:fixed;z-index:20;bottom:0;left:0;right:0;height:calc(72px + env(safe-area-inset-bottom));padding:5px 2px env(safe-area-inset-bottom);display:flex;justify-content:space-around;align-items:center;background:#fffdf7;border-top:1px solid var(--line)}
+nav button{border:0;background:none;color:#879286;min-width:50px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;padding:4px}
+nav button.active{color:var(--g);font-weight:800}
+nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.plus{width:38px;height:34px;border-radius:11px;background:var(--g);color:white;font-size:25px;display:grid;place-items:center}
+.card{background:white;border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:12px}
+.card h3{font-size:16px;margin:0 0 8px}
+.card p{font-size:13px;color:var(--muted);line-height:1.6;margin:5px 0}
+input,textarea,select{width:100%;padding:12px;border:1px solid #dce5d9;border-radius:12px;background:white;color:var(--ink);margin:6px 0 13px;outline-color:var(--g)}
+textarea{min-height:85px;resize:vertical}
+label{font-size:13px;font-weight:700;display:block;margin-top:7px}
+.primary,.secondary,.danger{border-radius:11px;padding:11px 14px;font-weight:700;border:0}
+.primary{background:var(--g);color:white}
+.secondary{background:white;color:var(--g);border:1px solid #dce5d9}
+.danger{background:white;color:#b45a5a;border:1px solid #efdada}
+.full{width:100%}.small{font-size:12px;padding:8px 11px}
+.feed-tools{position:sticky;top:58px;z-index:5;background:var(--bg);padding:12px 14px 7px}
+.feed-tools input{margin:0 0 8px;background:#f4f7f1}
+.filters{display:flex;gap:7px;overflow:auto}
+.filter{white-space:nowrap;border:1px solid #dce5d9;background:white;color:var(--g);border-radius:20px;padding:7px 13px;font-size:12px}
+.filter.active{background:var(--g);color:white}
+.post{height:min(690px,calc(100dvh - 205px));min-height:450px;position:relative;margin:0 0 13px;background:#dfe8dc;overflow:hidden;color:white}
+.post img,.post video{width:100%;height:100%;object-fit:cover;display:block}
 .post:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#0009);pointer-events:none}
-.post-info{position:absolute;z-index:2;bottom:22px;left:17px;right:78px;text-shadow:0 1px 5px #0008}
-.post-place{font-size:13px;font-weight:700;margin-bottom:8px}
-.post-title{font-size:21px;font-weight:800;margin-bottom:8px}
-.post-caption{font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
-.post-actions{position:absolute;right:13px;bottom:35px;z-index:3;display:flex;flex-direction:column;gap:19px;align-items:center}
-.action-item{display:flex;flex-direction:column;align-items:center;gap:3px}
-.action-btn{border:0;background:#ffffff25;color:white;border-radius:50%;width:45px;height:45px;display:grid;place-items:center;backdrop-filter:blur(8px)}
-.action-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8}
-.action-btn.liked{color:#ffb6b6}.action-btn.saved{color:#d8edc8}
-.action-count{font-size:11px;color:white}
-nav{position:fixed;bottom:0;left:0;right:0;height:75px;z-index:20;background:#fffdf7;border-top:1px solid #e6eae4;display:flex;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom)}
-nav button{border:0;background:none;color:#788579;min-width:55px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;padding:5px 2px}
-nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-nav button.active{color:var(--d);font-weight:800}
-.plus{display:grid;place-items:center;width:38px;height:34px;border-radius:11px;background:var(--g);color:white;font-size:26px}
-.section{padding:22px 17px}
-.section h2{font-size:22px;margin:4px 0 18px}
-.sub{font-size:13px;color:#829083;margin-top:-10px;margin-bottom:20px}
-.card{background:white;border:1px solid #e9eee7;border-radius:17px;padding:15px;margin-bottom:13px;box-shadow:0 3px 12px #263c2510}
-.card h3{margin:0 0 7px;font-size:16px}
-.card p{margin:4px 0;color:#788579;font-size:13px}
-.primary{border:0;border-radius:13px;background:var(--g);color:white;padding:13px 17px;font-weight:700}
-.secondary{border:1px solid #dce5d9;border-radius:12px;background:white;color:var(--d);padding:10px 13px}
-.danger{color:#b34b4b;border-color:#edcccc}
-input,textarea{width:100%;border:1px solid #dce5d9;border-radius:12px;padding:13px;background:white;color:var(--text);margin:6px 0 14px;outline-color:var(--g)}
-textarea{min-height:95px;resize:vertical}
-label{font-size:13px;font-weight:700}
-.preview{width:100%;max-height:280px;object-fit:contain;background:#edf1eb;border-radius:14px;margin:8px 0}
-.empty{text-align:center;color:#849184;padding:45px 15px;line-height:1.8}
-.profile-top{text-align:center;padding:28px 10px}
-.avatar{width:78px;height:78px;border-radius:50%;background:var(--p);display:grid;place-items:center;margin:0 auto 12px;font-size:30px;color:var(--g);font-weight:800}
-.stat-row{display:flex;justify-content:space-around;text-align:center;padding:15px}
-.stat strong{display:block;font-size:20px;color:var(--d)}
-.stat span{font-size:12px;color:#879286}
-.small{font-size:12px;padding:8px 11px}
-.modal-bg{display:none;position:fixed;inset:0;background:#0007;z-index:50;align-items:center;justify-content:center;padding:20px}
+.post-info{position:absolute;z-index:2;left:16px;right:75px;bottom:23px;text-shadow:0 1px 5px #0009}
+.place{font-size:12px;font-weight:700;margin-bottom:7px}
+.post-title{font-size:21px;font-weight:850;margin-bottom:7px}
+.caption{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.hashtags{font-size:12px;margin-top:7px;color:#e8f1e5}
+.actions{position:absolute;z-index:3;right:11px;bottom:26px;display:flex;flex-direction:column;gap:15px;align-items:center}
+.action{display:flex;flex-direction:column;align-items:center;gap:3px}
+.action button{width:43px;height:43px;border:0;border-radius:50%;background:#ffffff35;color:white;display:grid;place-items:center;backdrop-filter:blur(8px)}
+.action svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8}
+.action span{font-size:10px;color:white}
+.action .on{color:#d8f2ca}
+.action .liked{color:#ffb7c2}
+.empty{text-align:center;padding:35px 15px;color:var(--muted);font-size:13px;line-height:1.8}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.pill{display:inline-block;background:var(--p);color:var(--g);padding:5px 9px;border-radius:20px;font-size:11px}
+.profile{text-align:center;padding:25px 10px 12px}
+.avatar{width:76px;height:76px;border-radius:50%;background:var(--p);color:var(--g);display:grid;place-items:center;font-size:27px;font-weight:800;margin:0 auto 10px}
+.stats{display:flex;justify-content:space-around;text-align:center}
+.stats strong{display:block;font-size:20px;color:var(--g)}
+.stats span{font-size:11px;color:var(--muted)}
+.modal-bg{display:none;position:fixed;z-index:40;inset:0;background:#0007;align-items:center;justify-content:center;padding:17px}
 .modal-bg.show{display:flex}
-.modal{background:var(--cream);width:100%;max-width:400px;border-radius:20px;padding:20px;max-height:80vh;overflow:auto}
-.modal h3{margin-top:0}
-.modal-actions{display:flex;gap:9px;justify-content:flex-end}
-.comment{padding:9px 0;border-bottom:1px solid #e8eee6;font-size:14px;overflow-wrap:anywhere}
+.modal{background:var(--bg);border-radius:19px;padding:19px;width:100%;max-width:440px;max-height:85dvh;overflow:auto}
+.modal h3{margin:0 0 13px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.comment{padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;overflow-wrap:anywhere}
+.preview{width:100%;max-height:260px;object-fit:contain;border-radius:12px;background:#edf1eb;margin:8px 0}
+.pref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pref{border:1px solid var(--line);background:white;border-radius:9px;padding:8px 2px;font-size:11px}
+.pref.on{background:var(--p);border-color:var(--g);color:var(--g);font-weight:800}
 .saved-img{width:100%;max-height:190px;object-fit:cover;border-radius:12px}
-.post-delete{margin-top:9px;background:#0005;color:white;border:1px solid #ffffff88;border-radius:9px;padding:6px 10px;font-size:11px}
-.status{font-size:12px;color:#788579;line-height:1.6}
-@media(min-width:700px){body{max-width:480px;margin:auto;border-left:1px solid #eee;border-right:1px solid #eee}header,nav{max-width:480px;margin:auto}}
+.status{font-size:12px;color:var(--muted);line-height:1.6}
+@media(min-width:650px){body{max-width:600px;margin:auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}header,nav{max-width:600px;margin:auto}.post{border-radius:16px}}
 </style>
 </head>
 <body>
-<header><div class="logo">Momeli</div><div class="header-label">travel memories</div></header>
+<header><div class="logo">Momeli</div><div class="tagline">travel memories</div></header>
 <main>
-<section id="feedPage" class="page active"><div id="feed"></div></section>
-
-<section id="tripsPage" class="page">
-<div class="section">
-<h2>旅行</h2><p class="sub">行きたい場所や旅行の予定をまとめよう。</p>
-<div class="card">
-<h3>新しい旅行を作成</h3>
-<label>旅行の名前</label><input id="tripName" placeholder="例：沖縄旅行">
-<label>日付</label><input id="tripDate" type="date">
-<button class="primary" onclick="addTrip()">旅行を作成</button>
-</div>
-<div id="tripList"></div>
-</div>
+<section id="feedPage" class="page active">
+ <div class="feed-tools">
+  <input id="search" placeholder="場所・投稿・ハッシュタグを検索" oninput="renderFeed()">
+  <div class="filters">
+   <button class="filter active" onclick="setFilter('all',this)">おすすめ</button>
+   <button class="filter" onclick="setFilter('new',this)">新着</button>
+   <button class="filter" onclick="setFilter('saved',this)">保存済み</button>
+  </div>
+ </div>
+ <div id="feed"></div>
 </section>
 
-<section id="createPage" class="page">
-<div class="section">
-<h2>投稿を作成</h2><p class="sub">旅先で見つけた景色や思い出を共有しよう。</p>
-<div class="card">
-<label>写真・動画</label>
-<input id="mediaFile" type="file" accept="image/*,video/*" onchange="previewMedia(event)">
-<div id="mediaPreview"></div>
-<label>場所</label><input id="postPlace" placeholder="例：京都・嵐山">
-<label>タイトル</label><input id="postTitle" maxlength="60" placeholder="投稿のタイトル">
-<label>コメント</label><textarea id="postCaption" maxlength="1000" placeholder="おすすめポイントや旅の感想"></textarea>
-<button class="primary" id="publishButton" style="width:100%" onclick="publish()">投稿する</button>
-<p class="status" id="postStatus">写真は投稿時に自動圧縮して保存します。</p>
-</div>
-</div>
-</section>
+<section id="tripsPage" class="page"><div class="section">
+ <h2>旅行</h2><p class="desc">行きたい場所や旅の予定をまとめよう。</p>
+ <div class="card">
+  <h3>新しい旅行を作成</h3>
+  <label>旅行名</label><input id="tripName" placeholder="例：沖縄旅行">
+  <label>出発日</label><input id="tripDate" type="date">
+  <label>予算（円）</label><input id="tripBudget" type="number" placeholder="未定でもOK">
+  <label>メモ</label><textarea id="tripMemo" placeholder="行きたい場所など"></textarea>
+  <button class="primary full" onclick="addTrip()">旅行を作成</button>
+ </div>
+ <div id="tripList"></div>
+ <div class="card"><h3>旅先ルーレット</h3><p>次の旅行先を決めてみよう。</p><button class="primary full" onclick="roulette()">ルーレットを回す</button><div id="rouletteResult" style="text-align:center;padding:13px;color:var(--g);font-weight:800"></div></div>
+</div></section>
 
-<section id="savedPage" class="page">
-<div class="section"><h2>保存</h2><p class="sub">あとで見返したい投稿。</p><div id="savedList"></div></div>
-</section>
+<section id="createPage" class="page"><div class="section">
+ <h2>投稿を作成</h2><p class="desc">写真や動画と一緒に旅の思い出を残そう。</p>
+ <div class="card">
+  <label>写真・動画</label><input id="file" type="file" accept="image/*,video/*" onchange="preview(event)">
+  <div id="preview"></div>
+  <label>場所</label><input id="place" placeholder="例：京都・嵐山">
+  <label>タイトル</label><input id="title" maxlength="60" placeholder="投稿タイトル">
+  <label>コメント</label><textarea id="caption" maxlength="1000" placeholder="旅の感想やおすすめポイント"></textarea>
+  <label>ハッシュタグ</label><input id="tags" placeholder="#絶景 #カフェ #旅行">
+  <button class="primary full" id="publishButton" onclick="publish()">投稿する</button>
+  <p class="status" id="postStatus">写真は投稿時に自動圧縮します。</p>
+ </div>
+</div></section>
 
-<section id="profilePage" class="page">
-<div class="section">
-<div class="profile-top">
-<div class="avatar" id="avatar">M</div>
-<h2 id="profileName">マイページ</h2>
-<p class="sub" id="profileBio">旅の思い出を残しましょう。</p>
-<button class="secondary small" onclick="editProfile()">プロフィール編集</button>
-</div>
-<div class="card stat-row">
-<div class="stat"><strong id="postCount">0</strong><span>投稿</span></div>
-<div class="stat"><strong id="tripCount">0</strong><span>旅行</span></div>
-<div class="stat"><strong id="savedCount">0</strong><span>保存</span></div>
-</div>
-<div class="card"><h3>データについて</h3><p>投稿と旅行はこのブラウザ内に保存されます。他のユーザーや端末とは共有されません。</p></div>
-</div>
-</section>
+<section id="savedPage" class="page"><div class="section"><h2>保存</h2><p class="desc">あとで見返したい投稿。</p><div id="savedList"></div></div></section>
+
+<section id="profilePage" class="page"><div class="section">
+ <div class="profile">
+  <div class="avatar" id="avatar">M</div>
+  <h2 id="profileName">旅行好き</h2>
+  <p class="desc" id="profileBio">旅の思い出を記録しています。</p>
+  <button class="secondary small" onclick="editProfile()">プロフィールを編集</button>
+ </div>
+ <div class="card stats">
+  <div><strong id="postCount">0</strong><span>投稿</span></div>
+  <div><strong id="tripCount">0</strong><span>旅行</span></div>
+  <div><strong id="savedCount">0</strong><span>保存</span></div>
+  <div><strong id="followCount">0</strong><span>フォロー</span></div>
+ </div>
+ <div class="card"><h3>おすすめユーザー</h3><div id="users"></div><p>※表示確認用のサンプルです。</p></div>
+ <div class="card"><div class="row"><h3>通知</h3><button class="secondary small" onclick="clearNotices()">消去</button></div><div id="notices"></div></div>
+ <div class="card"><h3>訪れた都道府県</h3><p>訪問した場所をタップして記録できます。</p><div id="prefGrid" class="pref-grid"></div><p id="prefCount"></p></div>
+ <div class="card"><h3>データについて</h3><p>投稿や旅行はこのブラウザ内に保存されます。他の端末やユーザーとは共有されません。</p><button class="danger small" onclick="resetData()">投稿・旅行を初期化</button></div>
+</div></section>
 </main>
 
 <nav>
-<button class="active" onclick="showPage('feedPage',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4z"/></svg><span>フィード</span></button>
-<button onclick="showPage('tripsPage',this)"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM8 3v4m8-4v4M4 10h16"/></svg><span>旅行</span></button>
-<button onclick="showPage('createPage',this)"><span class="plus">＋</span><span>投稿</span></button>
-<button onclick="showPage('savedPage',this)"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg><span>保存</span></button>
-<button onclick="showPage('profilePage',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/></svg><span>マイページ</span></button>
+ <button class="active" onclick="showPage('feedPage',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4z"/></svg><span>フィード</span></button>
+ <button onclick="showPage('tripsPage',this)"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM8 3v4m8-4v4M4 10h16"/></svg><span>旅行</span></button>
+ <button onclick="showPage('createPage',this)"><span class="plus">＋</span><span>投稿</span></button>
+ <button onclick="showPage('savedPage',this)"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg><span>保存</span></button>
+ <button onclick="showPage('profilePage',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/></svg><span>マイページ</span></button>
 </nav>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)hideModal()"><div class="modal" id="modal"></div></div>
@@ -138,374 +157,434 @@ label{font-size:13px;font-weight:700}
 <script>
 "use strict";
 
-const DB_NAME="MomeliCoreV3";
-const STORE_POSTS="posts";
-const STORE_TRIPS="trips";
-let db,posts=[],trips=[],selectedFile=null;
+const DB_NAME="MomeliDB",DB_VERSION=2;
+const STATE_STORE="app",MEDIA_STORE="media";
+let db,posts=[],trips=[],filter="all",selectedFile=null;
 let profile={name:"旅行好き",bio:"旅の思い出を記録しています。"};
+let follows=[],notices=[],visited=[];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
 const samples=[
-{id:"sample1",place:"長野・上高地",title:"自然に囲まれた最高の景色",caption:"空気が澄んでいて、ずっと歩いていたくなる場所。",image:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1000",likes:12,liked:false,saved:false,comments:[],sample:true},
-{id:"sample2",place:"京都・嵐山",title:"京都でのんびり散歩",caption:"ゆっくり景色を楽しめるおすすめスポット。",image:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000",likes:24,liked:false,saved:false,comments:[],sample:true},
-{id:"sample3",place:"沖縄",title:"また行きたい海",caption:"ずっと眺めていたくなる景色。",image:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1000",likes:31,liked:false,saved:false,comments:[],sample:true}
+{id:"s1",place:"長野・上高地",title:"自然に囲まれた景色",caption:"空気が澄んでいて、ずっと歩いていたくなる場所。",image:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1000",likes:12,liked:false,saved:false,comments:[],tags:["絶景","自然"],sample:true},
+{id:"s2",place:"京都・嵐山",title:"京都でのんびり散歩",caption:"ゆっくり景色を楽しめるおすすめスポット。",image:"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000",likes:24,liked:false,saved:false,comments:[],tags:["京都","散歩"],sample:true},
+{id:"s3",place:"沖縄",title:"また行きたい海",caption:"ずっと眺めていたくなる景色。",image:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1000",likes:31,liked:false,saved:false,comments:[],tags:["海","絶景"],sample:true}
 ];
+const prefs="北海道 青森 岩手 宮城 秋田 山形 福島 茨城 栃木 群馬 埼玉 千葉 東京 神奈川 新潟 富山 石川 福井 山梨 長野 岐阜 静岡 愛知 三重 滋賀 京都 大阪 兵庫 奈良 和歌山 鳥取 島根 岡山 広島 山口 徳島 香川 愛媛 高知 福岡 佐賀 長崎 熊本 大分 宮崎 鹿児島 沖縄".split(" ");
+const demo=[["u1","週末トラベラー"],["u2","景色を探す人"],["u3","旅のアルバム"]];
+const mediaURLs=new Map();
 
 function openDB(){
-return new Promise((resolve,reject)=>{
-const req=indexedDB.open(DB_NAME,1);
-req.onupgradeneeded=()=>{
-const d=req.result;
-if(!d.objectStoreNames.contains(STORE_POSTS))d.createObjectStore(STORE_POSTS,{keyPath:"id"});
-if(!d.objectStoreNames.contains(STORE_TRIPS))d.createObjectStore(STORE_TRIPS,{keyPath:"id"});
-};
-req.onsuccess=()=>{db=req.result;resolve()};
-req.onerror=()=>reject(req.error);
-});
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open(DB_NAME,DB_VERSION);
+  request.onupgradeneeded=()=>{
+   const d=request.result;
+   if(!d.objectStoreNames.contains(STATE_STORE))d.createObjectStore(STATE_STORE);
+   if(!d.objectStoreNames.contains(MEDIA_STORE))d.createObjectStore(MEDIA_STORE);
+  };
+  request.onsuccess=()=>{db=request.result;resolve()};
+  request.onerror=()=>reject(request.error);
+  request.onblocked=()=>reject(new Error("データベース更新が保留中です。ページを閉じて再度開いてください。"));
+ });
 }
 
-function readAll(store){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readonly");
-const req=tx.objectStore(store).getAll();
-req.onsuccess=()=>resolve(req.result||[]);
-req.onerror=()=>reject(req.error);
-});
+function requestValue(request){
+ return new Promise((resolve,reject)=>{
+  request.onsuccess=()=>resolve(request.result);
+  request.onerror=()=>reject(request.error);
+ });
 }
 
-function writeRecord(store,record){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readwrite");
-tx.objectStore(store).put(record);
-tx.oncomplete=resolve;
-tx.onerror=()=>reject(tx.error||new Error("保存エラー"));
-tx.onabort=()=>reject(tx.error||new Error("保存が中断されました"));
-});
+async function load(){
+ const tx=db.transaction([STATE_STORE,MEDIA_STORE],"readonly");
+ const state=await requestValue(tx.objectStore(STATE_STORE).get("state"));
+ if(!state){
+  posts=samples.map(p=>({...p}));
+  trips=[];
+  return;
+ }
+ posts=state.posts||[];
+ trips=state.trips||[];
+ const mediaStore=tx.objectStore(MEDIA_STORE);
+ for(const p of posts){
+  if(!p.file && !p.image && !p.sample){
+   p.file=await requestValue(mediaStore.get(p.id));
+  }
+ }
+ // 旧バージョンで投稿データ内に保存された写真を新しい保存先へ移す
+ let migrated=false;
+ for(const p of posts){
+  if(p.file instanceof Blob){
+   migrated=true;
+  }
+ }
+ if(migrated)await save();
 }
 
-function deleteRecord(store,id){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readwrite");
-tx.objectStore(store).delete(id);
-tx.oncomplete=resolve;
-tx.onerror=()=>reject(tx.error);
-});
+async function save(){
+ return new Promise((resolve,reject)=>{
+  try{
+   const tx=db.transaction([STATE_STORE,MEDIA_STORE],"readwrite");
+   const stateStore=tx.objectStore(STATE_STORE);
+   const mediaStore=tx.objectStore(MEDIA_STORE);
+   const metadata=posts.map(p=>{
+    const copy={...p};
+    if(copy.file instanceof Blob)mediaStore.put(copy.file,copy.id);
+    delete copy.file;
+    delete copy.url;
+    return copy;
+   });
+   stateStore.put({posts:metadata,trips},"state");
+   tx.oncomplete=()=>resolve();
+   tx.onerror=()=>reject(tx.error||new Error("IndexedDBの保存に失敗しました"));
+   tx.onabort=()=>reject(tx.error||new Error("保存処理が中断されました"));
+  }catch(e){reject(e)}
+ });
 }
 
-async function savePost(p){await writeRecord(STORE_POSTS,p)}
-async function saveTrip(t){await writeRecord(STORE_TRIPS,t)}
+async function deleteMedia(id){
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(MEDIA_STORE,"readwrite");
+  tx.objectStore(MEDIA_STORE).delete(id);
+  tx.oncomplete=resolve;
+  tx.onerror=()=>reject(tx.error);
+ });
+}
 
+function loadLocal(){
+ try{
+  profile=JSON.parse(localStorage.getItem("momeliProfile"))||profile;
+  follows=JSON.parse(localStorage.getItem("momeliFollows"))||[];
+  notices=JSON.parse(localStorage.getItem("momeliNotices"))||[];
+  visited=JSON.parse(localStorage.getItem("momeliVisited"))||[];
+ }catch(e){}
+}
+function saveLocal(){
+ try{
+  localStorage.setItem("momeliProfile",JSON.stringify(profile));
+  localStorage.setItem("momeliFollows",JSON.stringify(follows));
+  localStorage.setItem("momeliNotices",JSON.stringify(notices));
+  localStorage.setItem("momeliVisited",JSON.stringify(visited));
+ }catch(e){}
+}
+function notify(text){
+ notices.unshift({text,date:new Date().toLocaleString("ja-JP")});
+ notices=notices.slice(0,30);saveLocal();renderNotices();
+}
 function showPage(id,btn){
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-$(id).classList.add("active");
-document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-btn?.classList.add("active");
-if(id==="feedPage")renderFeed();
-if(id==="tripsPage")renderTrips();
-if(id==="savedPage")renderSaved();
-if(id==="profilePage")renderStats();
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+ btn?.classList.add("active");
+ if(id==="feedPage")renderFeed();
+ if(id==="tripsPage")renderTrips();
+ if(id==="savedPage")renderSaved();
+ if(id==="profilePage")renderProfile();
 }
-
-const mediaURLs=new Map();
+function setFilter(f,btn){
+ filter=f;
+ document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+ btn.classList.add("active");renderFeed();
+}
 function media(p){
-if(p.file instanceof Blob){
-if(!mediaURLs.has(p.id))mediaURLs.set(p.id,URL.createObjectURL(p.file));
-return mediaURLs.get(p.id);
-}
-return p.image||"";
+ if(p.file instanceof Blob){
+  if(!mediaURLs.has(p.id))mediaURLs.set(p.id,URL.createObjectURL(p.file));
+  return mediaURLs.get(p.id);
+ }
+ return p.image||"";
 }
 
 function renderFeed(){
-$("feed").innerHTML=posts.length?posts.map(p=>`
-<article class="post" data-id="${esc(p.id)}">
-${p.type==="video"?`<video class="post-media" src="${media(p)}" controls playsinline></video>`:`<img class="post-media" src="${media(p)}" alt="${esc(p.title)}">`}
-<div class="post-info">
-<div class="post-place">${esc(p.place)}</div>
-<div class="post-title">${esc(p.title)}</div>
-<div class="post-caption">${esc(p.caption)}</div>
-${!p.sample?`<button class="post-delete" onclick="deletePost('${esc(p.id)}')">自分の投稿を削除</button>`:""}
-</div>
-<div class="post-actions">
-<div class="action-item"><button class="action-btn ${p.liked?"liked":""}" onclick="likePost('${esc(p.id)}')">${heartIcon()}</button><span class="action-count">${p.likes||0}</span></div>
-<div class="action-item"><button class="action-btn ${p.saved?"saved":""}" onclick="toggleSave('${esc(p.id)}')">${bookmarkIcon()}</button><span class="action-count">保存</span></div>
-<div class="action-item"><button class="action-btn" onclick="commentPost('${esc(p.id)}')">${commentIcon()}</button><span class="action-count">${(p.comments||[]).length}</span></div>
-<div class="action-item"><button class="action-btn" onclick="addPostToTrip('${esc(p.id)}')">${plusIcon()}</button><span class="action-count">旅行に追加</span></div>
-</div></article>`).join(""):'<div class="empty">投稿はまだありません。<br>最初の思い出を投稿しましょう。</div>';
+ const q=$("search").value.trim().toLowerCase();
+ let list=[...posts];
+ if(filter==="new")list=list.filter(p=>!p.sample);
+ if(filter==="saved")list=list.filter(p=>p.saved);
+ if(q)list=list.filter(p=>(p.place+" "+p.title+" "+p.caption+" "+(p.tags||[]).join(" ")).toLowerCase().includes(q));
+ if(!list.length){
+  $("feed").innerHTML='<div class="empty">投稿がありません。<br>検索ワードを変えてみてください。</div>';return;
+ }
+ $("feed").innerHTML=list.map(p=>`
+ <article class="post" data-id="${esc(p.id)}">
+ ${p.type==="video"?`<video src="${media(p)}" controls playsinline></video>`:`<img src="${media(p)}" alt="${esc(p.title)}">`}
+ <div class="post-info">
+  <div class="place">${esc(p.place)}</div>
+  <div class="post-title">${esc(p.title)}</div>
+  <div class="caption">${esc(p.caption)}</div>
+  <div class="hashtags">${(p.tags||[]).map(t=>"#"+esc(t)).join(" ")}</div>
+  ${!p.sample?`<button class="danger small" onclick="deletePost('${esc(p.id)}')">投稿を削除</button>`:""}
+ </div>
+ <div class="actions">
+  <div class="action"><button class="${p.liked?"on liked":""}" onclick="likePost('${esc(p.id)}')">${heartIcon()}</button><span class="like-count">${p.likes||0}</span></div>
+  <div class="action"><button class="${p.saved?"on":""}" onclick="toggleSave('${esc(p.id)}')">${bookmarkIcon()}</button><span>保存</span></div>
+  <div class="action"><button onclick="comments('${esc(p.id)}')">${commentIcon()}</button><span class="comment-count">${(p.comments||[]).length}</span></div>
+  <div class="action"><button onclick="addToTrip('${esc(p.id)}')">${plusIcon()}</button><span>旅行に追加</span></div>
+ </div></article>`).join("");
 }
-
 function heartIcon(){return '<svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.2-8.8 10.3-8.8 10.3S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z"/></svg>'}
 function bookmarkIcon(){return '<svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg>'}
 function commentIcon(){return '<svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8 8 8.8 8.8 0 0 1-4-.9L4 20l1.3-3.6A8 8 0 1 1 20 11.5Z"/></svg>'}
 function plusIcon(){return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>'}
 
 function updateCard(id){
-const p=posts.find(x=>x.id===id);
-const card=document.querySelector(`.post[data-id="${CSS.escape(id)}"]`);
-if(!p||!card)return;
-const buttons=card.querySelectorAll(".action-btn");
-buttons[0]?.classList.toggle("liked",!!p.liked);
-buttons[1]?.classList.toggle("saved",!!p.saved);
-card.querySelectorAll(".action-count")[0].textContent=p.likes||0;
-card.querySelectorAll(".action-count")[2].textContent=(p.comments||[]).length;
+ const p=posts.find(x=>x.id===id);
+ const card=[...document.querySelectorAll(".post")].find(x=>x.dataset.id===id);
+ if(!p||!card)return;
+ const buttons=card.querySelectorAll(".action button");
+ buttons[0].classList.toggle("on",!!p.liked);
+ buttons[0].classList.toggle("liked",!!p.liked);
+ buttons[1].classList.toggle("on",!!p.saved);
+ card.querySelector(".like-count").textContent=p.likes||0;
+ card.querySelector(".comment-count").textContent=(p.comments||[]).length;
+}
+function showSaveError(e){
+ console.error("Momeli save error:",e);
+ const name=e?.name||"Error";
+ if(name==="QuotaExceededError"||name==="NS_ERROR_DOM_QUOTA_REACHED"){
+  alert("端末の保存容量が不足しています。写真を圧縮しても保存できない状態です。端末の空き容量を確保してから再度お試しください。");
+ }else{
+  alert("保存できませんでした。\nエラー："+name+"\n"+(e?.message||"詳細不明"));
+ }
 }
 
 async function likePost(id){
-const p=posts.find(x=>x.id===id);if(!p)return;
-const oldLiked=!!p.liked,oldLikes=p.likes||0;
-p.liked=!oldLiked;p.likes=Math.max(0,oldLikes+(p.liked?1:-1));
-updateCard(id);
-try{await savePost(p)}catch(e){p.liked=oldLiked;p.likes=oldLikes;updateCard(id);showStorageError(e)}
+ const p=posts.find(x=>x.id===id);if(!p)return;
+ const oldLiked=p.liked,oldLikes=p.likes||0;
+ p.liked=!p.liked;p.likes=Math.max(0,oldLikes+(p.liked?1:-1));
+ updateCard(id);
+ try{await save()}catch(e){p.liked=oldLiked;p.likes=oldLikes;updateCard(id);showSaveError(e)}
 }
-
 async function toggleSave(id){
-const p=posts.find(x=>x.id===id);if(!p)return;
-const old=!!p.saved;p.saved=!old;
-updateCard(id);
-try{await savePost(p);renderSaved();renderStats()}
-catch(e){p.saved=old;updateCard(id);showStorageError(e)}
+ const p=posts.find(x=>x.id===id);if(!p)return;
+ const old=p.saved;p.saved=!p.saved;updateCard(id);
+ try{await save();renderSaved();stats()}
+ catch(e){p.saved=old;updateCard(id);showSaveError(e)}
 }
-
 function modal(html){$("modal").innerHTML=html;$("modalBg").classList.add("show")}
 function hideModal(){$("modalBg").classList.remove("show")}
-
-function commentPost(id){
-const p=posts.find(x=>x.id===id);if(!p)return;
-modal(`<h3>コメント</h3>
-<div id="commentList">${(p.comments||[]).map(c=>`<div class="comment">${esc(c)}</div>`).join("")||'<p class="sub">コメントはまだありません。</p>'}</div>
-<textarea id="commentInput" maxlength="300" placeholder="コメントを入力"></textarea>
-<div class="modal-actions"><button class="secondary" onclick="hideModal()">閉じる</button><button class="primary" onclick="sendComment('${esc(id)}')">送信</button></div>`);
+function comments(id){
+ const p=posts.find(x=>x.id===id);if(!p)return;
+ modal(`<h3>コメント</h3><div id="commentList">${(p.comments||[]).map(c=>`<div class="comment">${esc(c)}</div>`).join("")||'<p class="desc">コメントはまだありません。</p>'}</div><textarea id="commentText" maxlength="300" placeholder="コメントを入力"></textarea><div class="modal-actions"><button class="secondary" onclick="hideModal()">閉じる</button><button class="primary" onclick="sendComment('${esc(id)}')">送信</button></div>`);
 }
-
 async function sendComment(id){
-const p=posts.find(x=>x.id===id),v=$("commentInput")?.value.trim();
-if(!p||!v)return;
-p.comments=p.comments||[];
-p.comments.push(v);
-try{await savePost(p);hideModal();updateCard(id)}
-catch(e){p.comments.pop();showStorageError(e)}
+ const p=posts.find(x=>x.id===id),v=$("commentText").value.trim();
+ if(!p||!v)return;
+ p.comments=p.comments||[];p.comments.push(v);
+ try{await save();hideModal();updateCard(id);notify("コメントを追加しました。")}
+ catch(e){p.comments.pop();showSaveError(e)}
 }
-
-function addPostToTrip(id){
-if(!trips.length){alert("先に旅行を作成してください。");return}
-modal(`<h3>旅行に追加</h3>${trips.map(t=>`<button class="secondary" style="width:100%;margin:5px 0" onclick="attachPost('${esc(id)}','${esc(t.id)}')">${esc(t.name)}</button>`).join("")}<button class="secondary" style="width:100%;margin-top:8px" onclick="hideModal()">閉じる</button>`);
+function addToTrip(id){
+ if(!trips.length){alert("先に旅行を作成してください。");return}
+ modal(`<h3>旅行に追加</h3>${trips.map(t=>`<button class="secondary full" style="margin:5px 0" onclick="attach('${esc(id)}','${esc(t.id)}')">${esc(t.name)}</button>`).join("")}<button class="secondary full" style="margin-top:8px" onclick="hideModal()">閉じる</button>`);
 }
-
-async function attachPost(pid,tid){
-const t=trips.find(x=>x.id===tid);if(!t)return;
-t.posts=t.posts||[];
-if(!t.posts.includes(pid))t.posts.push(pid);
-try{await saveTrip(t);hideModal();renderTrips();alert("旅行に追加しました。")}
-catch(e){t.posts=t.posts.filter(x=>x!==pid);showStorageError(e)}
+async function attach(pid,tid){
+ const t=trips.find(x=>x.id===tid);if(!t)return;
+ t.posts=t.posts||[];
+ if(!t.posts.includes(pid))t.posts.push(pid);
+ try{await save();hideModal();renderTrips();notify("投稿を旅行に追加しました。")}
+ catch(e){t.posts=t.posts.filter(x=>x!==pid);showSaveError(e)}
 }
-
-function previewMedia(e){
-selectedFile=e.target.files?.[0]||null;
-const box=$("mediaPreview");
-if(!selectedFile){box.innerHTML="";return}
-const url=URL.createObjectURL(selectedFile);
-box.innerHTML=selectedFile.type.startsWith("video/")
-?`<video class="preview" src="${url}" controls playsinline></video>`
-:`<img class="preview" src="${url}" alt="投稿プレビュー">`;
+function preview(e){
+ selectedFile=e.target.files?.[0]||null;
+ $("preview").innerHTML="";
+ if(!selectedFile)return;
+ const url=URL.createObjectURL(selectedFile);
+ $("preview").innerHTML=selectedFile.type.startsWith("video/")
+ ?`<video class="preview" src="${url}" controls playsinline></video>`
+ :`<img class="preview" src="${url}" alt="投稿プレビュー">`;
 }
 
 function compressImage(file){
-return new Promise((resolve,reject)=>{
-const reader=new FileReader();
-reader.onerror=()=>reject(new Error("画像を読み込めませんでした。"));
-reader.onload=()=>{
-const img=new Image();
-img.onerror=()=>reject(new Error("この画像形式は読み込めません。JPEGまたはPNGをお試しください。"));
-img.onload=()=>{
-const max=1280;
-const scale=Math.min(1,max/Math.max(img.width,img.height));
-const canvas=document.createElement("canvas");
-canvas.width=Math.max(1,Math.round(img.width*scale));
-canvas.height=Math.max(1,Math.round(img.height*scale));
-const ctx=canvas.getContext("2d");
-if(!ctx){reject(new Error("画像の圧縮を開始できませんでした。"));return}
-ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.drawImage(img,0,0,canvas.width,canvas.height);
-canvas.toBlob(blob=>{
-if(!blob){reject(new Error("画像の圧縮に失敗しました。"));return}
-resolve(blob);
-},"image/jpeg",0.72);
-};
-img.src=reader.result;
-};
-reader.readAsDataURL(file);
-});
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onerror=()=>reject(new Error("画像を読み込めませんでした。"));
+  reader.onload=()=>{
+   const img=new Image();
+   img.onerror=()=>reject(new Error("画像を開けませんでした。JPEGまたはPNGをお試しください。"));
+   img.onload=()=>{
+    const max=1280,scale=Math.min(1,max/Math.max(img.width,img.height));
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(img.width*scale));
+    canvas.height=Math.max(1,Math.round(img.height*scale));
+    const ctx=canvas.getContext("2d");
+    if(!ctx){reject(new Error("画像圧縮を開始できませんでした。"));return}
+    ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    canvas.toBlob(blob=>{
+     if(!blob){reject(new Error("画像の圧縮に失敗しました。"));return}
+     resolve(blob);
+    },"image/jpeg",0.7);
+   };
+   img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+ });
 }
 
 async function publish(){
-const file=selectedFile;
-if(!file){alert("写真または動画を選択してください。");return}
-const place=$("postPlace").value.trim();
-const title=$("postTitle").value.trim();
-const caption=$("postCaption").value.trim();
-if(!place||!title){alert("場所とタイトルを入力してください。");return}
-
-const video=file.type.startsWith("video/");
-if(video&&file.size>10*1024*1024){
-alert("動画は10MB以下にしてください。写真は自動圧縮されます。");return;
-}
-if(!video&&!file.type.startsWith("image/")){
-alert("対応していないファイル形式です。");return;
-}
-
-const button=$("publishButton");
-button.disabled=true;
-button.textContent="投稿を準備中...";
-$("postStatus").textContent="写真を圧縮して保存しています。画面を閉じずにお待ちください。";
-
-let post;
-try{
-let mediaBlob=file;
-if(!video)mediaBlob=await compressImage(file);
-
-post={
-id:"post_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
-place,title,caption,
-file:mediaBlob,
-type:video?"video":"image",
-likes:0,liked:false,saved:false,comments:[],
-createdAt:Date.now()
-};
-
-await savePost(post);
-posts.unshift(post);
-selectedFile=null;
-$("mediaFile").value="";
-$("mediaPreview").innerHTML="";
-$("postPlace").value="";
-$("postTitle").value="";
-$("postCaption").value="";
-$("postStatus").textContent="投稿できました。";
-renderFeed();renderStats();
-showPage("feedPage",document.querySelector("nav button"));
-alert("投稿できました！");
-}catch(e){
-console.error(e);
-$("postStatus").textContent="投稿に失敗しました。入力内容は残しています。";
-showStorageError(e);
-}finally{
-button.disabled=false;
-button.textContent="投稿する";
-}
-}
-
-function showStorageError(e){
-if(e?.name==="QuotaExceededError"||e?.name==="NS_ERROR_DOM_QUOTA_REACHED"){
-alert("端末の保存容量が不足しています。写真を圧縮しても保存できない状態です。端末の空き容量を確保してから、もう一度お試しください。");
-}else{
-alert("保存できませんでした。\n"+(e?.message||"ブラウザの保存機能を確認してください。"));
-}
+ const file=selectedFile;
+ if(!file){alert("写真または動画を選んでください。");return}
+ const place=$("place").value.trim(),title=$("title").value.trim();
+ if(!place||!title){alert("場所とタイトルを入力してください。");return}
+ const video=file.type.startsWith("video/");
+ if(video&&file.size>8*1024*1024){
+  alert("動画は8MB以下にしてください。動画は自動圧縮できないため、写真での投稿もお試しください。");return;
+ }
+ if(!video&&!file.type.startsWith("image/")){
+  alert("このファイル形式には対応していません。");return;
+ }
+ const button=$("publishButton");
+ button.disabled=true;button.textContent="投稿を保存中...";
+ $("postStatus").textContent="写真を圧縮して保存しています。画面を閉じずにお待ちください。";
+ let p;
+ try{
+  const blob=video?file:await compressImage(file);
+  p={
+   id:"p"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+   place,title,caption:$("caption").value.trim(),
+   tags:$("tags").value.split(/[ ,、]+/).map(x=>x.replace(/^#/,"").trim()).filter(Boolean),
+   file:blob,type:video?"video":"image",
+   likes:0,liked:false,saved:false,comments:[],createdAt:Date.now()
+  };
+  posts.unshift(p);
+  try{await save()}catch(e){posts.shift();throw e}
+  selectedFile=null;
+  ["file","place","title","caption","tags"].forEach(id=>$(id).value="");
+  $("preview").innerHTML="";
+  $("postStatus").textContent="投稿を保存しました。";
+  stats();showPage("feedPage",document.querySelector("nav button"));
+  alert("投稿できました！");
+ }catch(e){
+  console.error("Momeli post error:",e);
+  $("postStatus").textContent="投稿に失敗しました。選択した写真と入力内容は残しています。";
+  showSaveError(e);
+ }finally{
+  button.disabled=false;button.textContent="投稿する";
+ }
 }
 
 async function deletePost(id){
-const p=posts.find(x=>x.id===id);
-if(!p||p.sample)return;
-if(!confirm("この投稿を削除しますか？"))return;
-try{
-await deleteRecord(STORE_POSTS,id);
-posts=posts.filter(x=>x.id!==id);
-for(const t of trips){t.posts=(t.posts||[]).filter(x=>x!==id);await saveTrip(t)}
-if(mediaURLs.has(id)){URL.revokeObjectURL(mediaURLs.get(id));mediaURLs.delete(id)}
-renderFeed();renderSaved();renderStats();renderTrips();
-}catch(e){showStorageError(e)}
+ const p=posts.find(x=>x.id===id);
+ if(!p||p.sample)return;
+ if(!confirm("この投稿を削除しますか？"))return;
+ const oldPosts=posts,oldTrips=trips.map(t=>({...t,posts:[...(t.posts||[])]}));
+ posts=posts.filter(x=>x.id!==id);
+ trips.forEach(t=>t.posts=(t.posts||[]).filter(x=>x!==id));
+ try{
+  await save();await deleteMedia(id);
+  if(mediaURLs.has(id)){URL.revokeObjectURL(mediaURLs.get(id));mediaURLs.delete(id)}
+  renderFeed();renderSaved();renderTrips();stats();
+ }catch(e){posts=oldPosts;trips=oldTrips;showSaveError(e)}
 }
 
 async function addTrip(){
-const name=$("tripName").value.trim();
-if(!name){alert("旅行の名前を入力してください。");return}
-const t={id:"trip_"+Date.now(),name,date:$("tripDate").value,posts:[],memo:"",places:[]};
-try{await saveTrip(t);trips.push(t);$("tripName").value="";$("tripDate").value="";renderTrips();renderStats()}
-catch(e){showStorageError(e)}
+ const name=$("tripName").value.trim();
+ if(!name){alert("旅行名を入力してください。");return}
+ trips.push({id:"t"+Date.now(),name,date:$("tripDate").value,budget:Number($("tripBudget").value)||0,memo:$("tripMemo").value.trim(),posts:[],places:[]});
+ try{
+  await save();["tripName","tripDate","tripBudget","tripMemo"].forEach(id=>$(id).value="");
+  renderTrips();stats();
+ }catch(e){trips.pop();showSaveError(e)}
 }
-
 function renderTrips(){
-$("tripList").innerHTML=trips.length?trips.map(t=>`
-<div class="card">
-<h3>${esc(t.name)}</h3>
-<p>${esc(t.date||"日程未定")} ・ ${(t.posts||[]).length}件の投稿</p>
-<button class="secondary small" onclick="tripDetail('${esc(t.id)}')">詳細</button>
-<button class="secondary danger small" onclick="deleteTrip('${esc(t.id)}')">削除</button>
-</div>`).join(""):'<div class="empty">旅行はまだありません。</div>';
+ $("tripList").innerHTML=trips.length?trips.map(t=>`
+ <div class="card"><div class="row"><h3>${esc(t.name)}</h3><span class="pill">${(t.posts||[]).length}件の投稿</span></div>
+ <p>${esc(t.date||"日程未定")} ${t.budget?"・予算 "+t.budget.toLocaleString()+"円":""}</p>
+ <p>${esc(t.memo||"メモなし")}</p>
+ <button class="secondary small" onclick="tripDetail('${esc(t.id)}')">詳細・編集</button>
+ <button class="danger small" onclick="deleteTrip('${esc(t.id)}')">削除</button></div>`).join(""):'<div class="empty">旅行はまだありません。</div>';
 }
-
 function tripDetail(id){
-const t=trips.find(x=>x.id===id);if(!t)return;
-const related=posts.filter(p=>(t.posts||[]).includes(p.id));
-modal(`<h3>${esc(t.name)}</h3><p>${esc(t.date||"日程未定")}</p>
-<label>行きたい場所（改行で区切る）</label>
-<textarea id="tripPlaces">${esc((t.places||[]).join("\n"))}</textarea>
-<label>メモ</label><textarea id="tripMemo">${esc(t.memo||"")}</textarea>
-<p>追加した投稿：${related.length}件</p>
-${related.map(p=>`<div class="comment">${esc(p.title)} ・ ${esc(p.place)}</div>`).join("")}
-<div class="modal-actions"><button class="secondary" onclick="hideModal()">閉じる</button><button class="primary" onclick="saveTripDetail('${esc(id)}')">保存</button></div>`);
+ const t=trips.find(x=>x.id===id);if(!t)return;
+ modal(`<h3>${esc(t.name)}</h3><label>行きたい場所（改行で区切る）</label><textarea id="tripPlaces">${esc((t.places||[]).join("\n"))}</textarea><label>メモ</label><textarea id="tripMemoEdit">${esc(t.memo)}</textarea><label>予算（円）</label><input id="tripBudgetEdit" type="number" value="${t.budget||0}"><p>追加した投稿：${(t.posts||[]).length}件</p><div class="modal-actions"><button class="secondary" onclick="hideModal()">閉じる</button><button class="primary" onclick="saveTrip('${esc(id)}')">保存</button></div>`);
 }
-
-async function saveTripDetail(id){
-const t=trips.find(x=>x.id===id);if(!t)return;
-t.places=$("tripPlaces").value.split("\n").map(x=>x.trim()).filter(Boolean);
-t.memo=$("tripMemo").value.trim();
-try{await saveTrip(t);hideModal();renderTrips()}
-catch(e){showStorageError(e)}
+async function saveTrip(id){
+ const t=trips.find(x=>x.id===id);if(!t)return;
+ const old={...t};
+ t.places=$("tripPlaces").value.split("\n").map(x=>x.trim()).filter(Boolean);
+ t.memo=$("tripMemoEdit").value.trim();t.budget=Number($("tripBudgetEdit").value)||0;
+ try{await save();hideModal();renderTrips()}
+ catch(e){Object.assign(t,old);showSaveError(e)}
 }
-
 async function deleteTrip(id){
-if(!confirm("この旅行を削除しますか？"))return;
-try{await deleteRecord(STORE_TRIPS,id);trips=trips.filter(t=>t.id!==id);renderTrips();renderStats()}
-catch(e){showStorageError(e)}
+ if(!confirm("この旅行を削除しますか？"))return;
+ const old=trips;trips=trips.filter(t=>t.id!==id);
+ try{await save();renderTrips();stats()}
+ catch(e){trips=old;showSaveError(e)}
 }
-
 function renderSaved(){
-const list=posts.filter(p=>p.saved);
-$("savedList").innerHTML=list.length?list.map(p=>`
-<div class="card">
-${p.type==="video"?`<video class="saved-img" src="${media(p)}" controls playsinline></video>`:`<img class="saved-img" src="${media(p)}" alt="${esc(p.title)}">`}
-<h3>${esc(p.title)}</h3><p>${esc(p.place)}</p>
-<button class="secondary small" onclick="toggleSave('${esc(p.id)}')">保存を解除</button>
-</div>`).join(""):'<div class="empty">保存した投稿はありません。</div>';
+ const list=posts.filter(p=>p.saved);
+ $("savedList").innerHTML=list.length?list.map(p=>`
+ <div class="card">
+ ${p.type==="video"?`<video class="saved-img" src="${media(p)}" controls playsinline></video>`:`<img class="saved-img" src="${media(p)}" alt="${esc(p.title)}">`}
+ <h3>${esc(p.title)}</h3><p>${esc(p.place)}</p>
+ <button class="secondary small" onclick="toggleSave('${esc(p.id)}')">保存を解除</button>
+ </div>`).join(""):'<div class="empty">保存した投稿はありません。</div>';
 }
-
-function renderStats(){
-$("postCount").textContent=posts.filter(p=>!p.sample).length;
-$("tripCount").textContent=trips.length;
-$("savedCount").textContent=posts.filter(p=>p.saved).length;
+function stats(){
+ $("postCount").textContent=posts.filter(p=>!p.sample).length;
+ $("tripCount").textContent=trips.length;
+ $("savedCount").textContent=posts.filter(p=>p.saved).length;
+ $("followCount").textContent=follows.length;
 }
-
 function editProfile(){
-modal(`<h3>プロフィール編集</h3><label>名前</label><input id="editName" maxlength="24" value="${esc(profile.name)}"><label>自己紹介</label><textarea id="editBio" maxlength="120">${esc(profile.bio)}</textarea><div class="modal-actions"><button class="secondary" onclick="hideModal()">キャンセル</button><button class="primary" onclick="saveProfile()">保存</button></div>`);
+ modal(`<h3>プロフィール編集</h3><label>名前</label><input id="editName" maxlength="24" value="${esc(profile.name)}"><label>自己紹介</label><textarea id="editBio" maxlength="120">${esc(profile.bio)}</textarea><div class="modal-actions"><button class="secondary" onclick="hideModal()">キャンセル</button><button class="primary" onclick="saveProfile()">保存</button></div>`);
 }
 function saveProfile(){
-const name=$("editName").value.trim();if(!name){alert("名前を入力してください。");return}
-profile={name,bio:$("editBio").value.trim()};
-try{localStorage.setItem("momeliProfile",JSON.stringify(profile))}catch(e){}
-$("profileName").textContent=profile.name;
-$("profileBio").textContent=profile.bio;
-$("avatar").textContent=profile.name.slice(0,1);
-hideModal();
+ const name=$("editName").value.trim();if(!name){alert("名前を入力してください。");return}
+ profile={name,bio:$("editBio").value.trim()};saveLocal();hideModal();renderProfile();
+}
+function renderUsers(){
+ $("users").innerHTML=demo.map(([id,name])=>`<div class="row"><b>${esc(name)}</b><button class="secondary small" onclick="toggleFollow('${id}')">${follows.includes(id)?"フォロー中":"フォロー"}</button></div>`).join("");
+}
+function toggleFollow(id){
+ follows=follows.includes(id)?follows.filter(x=>x!==id):[...follows,id];
+ saveLocal();renderProfile();notify("フォロー情報を更新しました。");
+}
+function renderNotices(){
+ $("notices").innerHTML=notices.length?notices.map(n=>`<div class="comment">${esc(n.text)}<p>${esc(n.date)}</p></div>`).join(""):'<p class="desc">通知はありません。</p>';
+}
+function clearNotices(){notices=[];saveLocal();renderNotices()}
+function renderPrefs(){
+ $("prefGrid").innerHTML=prefs.map(p=>`<button class="pref ${visited.includes(p)?"on":""}" onclick="togglePref('${p}')">${p}</button>`).join("");
+ $("prefCount").textContent=`訪問済み：${visited.length} / 47`;
+}
+function togglePref(p){
+ visited=visited.includes(p)?visited.filter(x=>x!==p):[...visited,p];
+ saveLocal();renderPrefs();
+}
+function renderProfile(){
+ $("profileName").textContent=profile.name;$("profileBio").textContent=profile.bio;
+ $("avatar").textContent=profile.name.slice(0,1);
+ stats();renderUsers();renderNotices();renderPrefs();
+}
+function roulette(){
+ const places=["北海道","東京","長野","石川","京都","大阪","兵庫","広島","香川","福岡","長崎","沖縄"];
+ $("rouletteResult").textContent="次の行き先："+places[Math.floor(Math.random()*places.length)];
+}
+async function resetData(){
+ if(!confirm("端末内の投稿・旅行データを初期化しますか？"))return;
+ try{
+  const tx=db.transaction([STATE_STORE,MEDIA_STORE],"readwrite");
+  tx.objectStore(STATE_STORE).delete("state");
+  tx.objectStore(MEDIA_STORE).clear();
+  await new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+  posts=samples.map(p=>({...p}));trips=[];
+  mediaURLs.forEach(url=>URL.revokeObjectURL(url));mediaURLs.clear();
+  renderFeed();renderTrips();renderSaved();stats();
+  alert("初期化しました。");
+ }catch(e){showSaveError(e)}
 }
 
 async function start(){
-try{
-profile=JSON.parse(localStorage.getItem("momeliProfile"))||profile;
-}catch(e){}
-$("profileName").textContent=profile.name;
-$("profileBio").textContent=profile.bio;
-$("avatar").textContent=profile.name.slice(0,1);
-try{
-await openDB();
-posts=await readAll(STORE_POSTS);
-trips=await readAll(STORE_TRIPS);
-if(!posts.length)posts=samples.map(p=>({...p}));
-}catch(e){
-console.error("Database error:",e);
-$("feed").innerHTML='<div class="empty">保存機能を開始できませんでした。ブラウザの設定をご確認ください。</div>';
-return;
-}
-renderFeed();renderTrips();renderSaved();renderStats();
+ loadLocal();
+ try{
+  await openDB();
+  await load();
+ }catch(e){
+  console.error("Momeli startup error:",e);
+  $("feed").innerHTML='<div class="empty">保存機能を開始できませんでした。ブラウザを再読み込みしてください。<br>'+esc(e.message||"")+'</div>';
+  return;
+ }
+ renderFeed();renderTrips();renderSaved();renderProfile();
 }
 start();
 </script>
